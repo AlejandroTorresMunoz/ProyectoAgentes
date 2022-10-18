@@ -1,0 +1,28 @@
+/*
+    proyectoprueba
+    ---------------------------
+
+    Jason Project File
+
+    This file defines the initial state of the MAS
+
+    Jason 2.5.1
+    octubre 17, 2022 - 20:38:54
+*/
+
+MAS proyectoprueba {
+
+    infrastructure: Local
+
+    environment: TestEnv //Archivo del enviroment
+ 
+    agents: sample_agent; //Agente 0
+        
+
+        tom; //Agente 1
+
+        bob; //Agente 2
+
+        caj; //Agente cajero --> Id 0
+
+}
