@@ -21,7 +21,11 @@ pos_caj_dev(P) :- pos(P,0,0).
 +!registrar_dev(INFO) : msg(M)[source(Ag)] <-  //Si se da la condición de recibir la necesidad de registrar de una devolución, habiendo recibido un mensaje
 	.print("Cajero : Surge la necesidad de registrar la devolución de un libro de : ",Ag);
 	.print("info : ",INFO);
-	tomar_libro(0,0,INFO). //PROBAR ESTA ACCIÓN
+	tomar_libro(1,1,INFO); //Toma el libro de la caja
+	colocar_libro(0,0,"cajon_dev",INFO); //Coloca 
+	.print("Cajero : Secuencia terminada");
+	.send(Ag,tell,msg("Libro Devuelto")).
+	
 	/*
 	tomar_libro(x_caj,y_caj,info_libro); //Se toma el libro
 	colocar_libro(info_libro,caj_dev); //Se coloca sobre el concepto del cajón de devoluciones 

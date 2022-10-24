@@ -19,7 +19,7 @@ libro_tomado.//(libro("REVERTE","ALATRISTE","BOLSILLO",20.0,"FICCION","ALQUILER"
 						   .send(ID_CAJERO,tell,msg("Saludo"));
 						   +cajero(ID_CAJERO); //Se añade la percepción del cajero
 						   .print("Concepto de ID_CAJERO incluido");
-						   .map.create(INFO_LIBRO); //Creación del map info_libro
+						   .map.create(INFO_LIBRO); //Creación del map info_libro (diccionario)
 						   .map.put(INFO_LIBRO,autor,"REVERTE");
 						   .map.put(INFO_LIBRO,titulo,"ALATRISTE");
 						   +libro_tomado(INFO_LIBRO); //Se añade la posesión del libro
@@ -32,10 +32,12 @@ libro_tomado.//(libro("REVERTE","ALATRISTE","BOLSILLO",20.0,"FICCION","ALQUILER"
 @a1 //Plan para devolver un libro
 +!devolver_libro : libro_tomado(INFO) & cajero(ID)<-// & info_libro(INFO)<- //Se se tiene el concepto de tener un libro
 	//.wait(2000);
-	colocar_libro(2,1,"caja"); //Ejecutar la acción de colocar libro en la caja;
+	colocar_libro(2,1,"caja",INFO); //Ejecutar la acción de colocar libro en la caja;
 	//.send(ID,tell,msg("Hola"));
 	.send(ID,achieve,registrar_dev(INFO)); //Se le comunica al cajero el request de registrar la devolución
 	.print("Request enviado").
+	
++msg(M)[source(Ag)] :  true <- .print("Message from ",Ag,": ",M);-msg(M). //Para cuando llegue un mensaje
 	
  
 

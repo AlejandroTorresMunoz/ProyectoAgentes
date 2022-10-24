@@ -21,13 +21,14 @@ import java.util.logging.Logger;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
+import java.util.*;
 import java.util.HashMap;
 import java.util.Iterator;  
 import java.lang.String;
 import java.lang.reflect.Type;
+import java.lang.reflect.Field;
 import java.util.logging.*;
 import java.lang.reflect.Field;
-
 
 
 public class TestEnv extends Environment {
@@ -48,14 +49,28 @@ public class TestEnv extends Environment {
         }
     }
 
+    public static <T> T[] append(T[] arr, T element) {
+        final int N = arr.length;
+        arr = Arrays.copyOf(arr, N + 1);
+        arr[N] = element;
+        return arr;
+    }
+
+    //Array con los libros en el cajon de devoluciones
+    public int num_libros_cajon = 0;
+    public InfoLibro[] libros_cajon = {};
+
     //ID's de los objetos --> IMPORTANTE : Por lo que parece, los objetos sólo pueden tener una ID que sea MULTIPLO DE 2
     public static final int CAJA = 16; //Código del objeto de la caja
     public static final int LIBRO = 32; //Código del objeto LIBRO
+    public static final int CAJON = 64; //Código del objeto de la caja
 
     //Posición de los objetos
     public static final int pos_x_caja = 1; //Posición de la caja, en x
     public static final int pos_y_caja = 1; //Posición de la caja, en y
-
+    //Posición del cajón de devoluciones
+    public static final int pos_x_cajon = 0; //Posición de la caja, en x
+    public static final int pos_y_cajon = 0; //Posición de la caja, en y
     //Definición de acciones de los agentes
     public static final Term colocar_libro = Literal.parseLiteral("colocar_libro(x,y,tipo_objeto)"); //Acción para colocar un libro en una posición
     public static final Term tomar_libro   = Literal.parseLiteral("tomar_libro(x,y,tipo_objeto)"); //Acción para tomar un libro de una posición
@@ -110,9 +125,19 @@ public class TestEnv extends Environment {
                 //En el caso de que se trate de colocar un libro
                 int x = (int)((NumberTerm)action.getTerm(0)).solve(); //En primer parámetro de la función es la x
                 int y = (int)((NumberTerm)action.getTerm(1)).solve(); //El segundo parámetro de la función es la y
-                
                 String tipo_objeto = (String)((StringTerm)action.getTerm(2)).getString(); //El tercer término es el tipo de objeto donde se deposita el libro
-                model.colocarlibro(x, y, tipo_objeto); //Se ejecuta la acción
+                java.util.Collection<Term> valores = ((MapTerm)action.getTerm(3)).values(); //Valores recibidas
+
+                Object[] aux = valores.toArray(); //Array de objetos con los valores recibidos
+                String[] values = new String[aux.length]; //Array de strings donde se van a almacenar los valores recibidos
+                for(int i=0;i<aux.length;i++)
+                {
+                    values[i] = aux[i].toString(); //Se guarda cada uno de los valores
+                }
+
+                InfoLibro info = new InfoLibro(values); //Clase para almacenar la información del libro
+                
+                model.colocarlibro(x, y, tipo_objeto, info); //Se ejecuta la acción
             }
             else if(action.getFunctor().equals("tomar_libro"))
             {
@@ -224,6 +249,8 @@ public class TestEnv extends Environment {
             //add(CAJA, pos_x_caja, pos_y_caja); //Inicialización de un objeto de tipo CAJA sobre la posición 1,1
             //super.add(LIBRO, 8,8);
             add(CAJA, pos_x_caja, pos_y_caja); //Inicialización de un objeto de tipo CAJA sobre la posición 1,1
+            add(CAJON, pos_x_cajon, pos_y_cajon); //Inicialización de un objeto de tipo CAJON sobre la posición 0,0
+
         }
 
         /*
@@ -231,17 +258,32 @@ public class TestEnv extends Environment {
          * Colocar un libro
          */
 
-        void colocarlibro(int x, int y, String tipo_objeto)
+        void colocarlibro(int x, int y, String tipo_objeto, InfoLibro Libro)
         {
             /*
              * Función para colocar un libro sobre una posición dada, sobre un tipo de objeto dado
              */
             Location pos_col = new Location(x,y); //Posición donde se va a colocar el libro
-            add(LIBRO, pos_col.x, pos_col.y); //Se añade el libro sobre la posición x,y
+            if(tipo_objeto == "cajon_dev")
+            {
+                //Si se coloca sobre el cajón de devoluciones
+                //libros_cajon = append(libros_cajon,Libro);  
+                if(num_libros_cajon == 0)
+                {
+                    libros_cajon = append(libros_cajon, Libro);
+                    num_libros_cajon++;
+                    logger.info(Integer.toString(libros_cajon.length));
+                }                   
+            }
+            else
+            {
+                //Otro caso
+                add(LIBRO, pos_col.x, pos_col.y); //Se añade el libro sobre la posición x,y 
+            }
             logger.info("Libro colocado");
             logger.info("x : "+Integer.toString(x));
             logger.info("y : "+Integer.toString(y));
-
+            
         }
 
     }
@@ -277,6 +319,9 @@ public class TestEnv extends Environment {
                 case TestEnv.LIBRO:
                     //En el caso de que se tenga que dibujar un libro
                     drawLibro(g,x,y);
+                    break;
+                case TestEnv.CAJON:
+                    drawCajon(g,x,y);
                     break;
             }
         }
@@ -314,14 +359,22 @@ public class TestEnv extends Environment {
             super.drawObstacle(g, x, y);
             g.setColor(Color.WHITE);
             drawString(g,x,y,defaultFont, "Caja"); //Se dibuja la cadena sobre la posición de la caja
-            logger.info("Dibujando caja");
+            //repaint();
+        }
+
+        public void drawCajon(Graphics g, int x, int y)
+        {
+            //Función para dibujar la caja
+            g.setColor(Color.BLACK);
+            super.drawObstacle(g, x, y);
+            g.setColor(Color.MAGENTA);
+            drawString(g,x,y,defaultFont, "Cajon"); //Se dibuja la cadena sobre la posición de la caja
             //repaint();
         }
 
         public void drawLibro(Graphics g, int x, int y)
         {
             //Función para dibujar un libro
-            logger.info("Dibujando libro");
             g.setColor(Color.BLUE);
             super.drawObstacle(g, x, y);
             g.setColor(Color.WHITE);
