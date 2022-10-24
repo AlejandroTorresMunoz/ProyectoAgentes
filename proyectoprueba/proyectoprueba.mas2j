@@ -14,7 +14,7 @@ MAS proyectoprueba {
 
     infrastructure: Local
 
-    environment: TestEnv //Archivo del enviroment
+    environment: env.TestEnv() //Archivo del enviroment
  
     agents: 
         caj; //Agente cajero --> Id 0
