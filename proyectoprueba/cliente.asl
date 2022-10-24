@@ -27,6 +27,12 @@ libro_tomado.//(libro("REVERTE","ALATRISTE","BOLSILLO",20.0,"FICCION","ALQUILER"
 						   !devolver_libro; //Una vez que conoce al cajero, se le pone la necesidad de devolverle un libro
 						   .wait(2000). //Le envia el concepto de cajero
 
+						   
++!at(cliente,P) : at(cliente,P) <- true.
++!at(cliente,P) : not at(cliente,P)
+  <- move_towards(P);
+     !at(cliente,P).
+
 
 
 @a1 //Plan para devolver un libro

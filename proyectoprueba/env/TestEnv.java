@@ -131,6 +131,10 @@ public class TestEnv extends Environment {
                 }
 
                 InfoLibro info = new InfoLibro(values); //Clase para almacenar la información del libro
+            }else if (action.getFunctor().equals("move_towards")) {
+                int x = (int)((NumberTerm)action.getTerm(0)).solve();
+                int y = (int)((NumberTerm)action.getTerm(1)).solve();
+                model.moveTowards(x,y);
             }
             else
             {
@@ -326,6 +330,19 @@ public class TestEnv extends Environment {
             super.drawObstacle(g, x, y);
             g.setColor(Color.WHITE);
             drawString(g,x,y,defaultFont, "Libro"); //Se dibuja la cadena sobre la posición del lirbo
+        }
+		
+		void moveTowards(int x, int y) throws Exception {
+            Location r1 = getAgPos(1);
+            if (r1.x < x)
+                r1.x++;
+            else if (r1.x > x)
+                r1.x--;
+            if (r1.y < y)
+                r1.y++;
+            else if (r1.y > y)
+                r1.y--;
+            setAgPos(1, r1);
         }
 
     }

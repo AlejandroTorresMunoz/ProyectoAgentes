@@ -19,11 +19,10 @@ libro_tomado.//(libro("REVERTE","ALATRISTE","BOLSILLO",20.0,"FICCION","ALQUILER"
 						   .send(ID_CAJERO,tell,msg("Saludo"));
 						   +cajero(ID_CAJERO); //Se añade la percepción del cajero
 						   .print("Concepto de ID_CAJERO incluido");
-						   +libro_tomado; //Se añade la posesión del libro
 						   .map.create(INFO_LIBRO); //Creación del map info_libro
+						   .map.put(INFO_LIBRO,autor,"REVERTE");
 						   .map.put(INFO_LIBRO,titulo,"ALATRISTE");
-						   //.set.add(libro,"ALATRISTE");
-						   //+info_libro(INFO_LIBRO);
+						   +libro_tomado(INFO_LIBRO); //Se añade la posesión del libro
 						   .print("Concepto de libro tomado incluido");
 						   !devolver_libro; //Una vez que conoce al cajero, se le pone la necesidad de devolverle un libro
 						   .wait(2000). //Le envia el concepto de cajero
@@ -31,7 +30,7 @@ libro_tomado.//(libro("REVERTE","ALATRISTE","BOLSILLO",20.0,"FICCION","ALQUILER"
 
 
 @a1 //Plan para devolver un libro
-+!devolver_libro : libro_tomado & cajero(ID)<-// & info_libro(INFO)<- //Se se tiene el concepto de tener un libro
++!devolver_libro : libro_tomado(INFO) & cajero(ID)<-// & info_libro(INFO)<- //Se se tiene el concepto de tener un libro
 	//.wait(2000);
 	colocar_libro(2,1,"caja"); //Ejecutar la acción de colocar libro en la caja;
 	//.send(ID,tell,msg("Hola"));
