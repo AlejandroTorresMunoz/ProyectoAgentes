@@ -13,6 +13,7 @@ libro_tomado.//(libro("REVERTE","ALATRISTE","BOLSILLO",20.0,"FICCION","ALQUILER"
 
 
 /*----------------*/
+//Plan para conocer un cajero
 +!conocer_cajero : true <- .wait(2000); //Espera 2 segundos
 						   .df_search("cajero",ID_CAJERO);
 						   .print(ID_CAJERO);
@@ -26,7 +27,7 @@ libro_tomado.//(libro("REVERTE","ALATRISTE","BOLSILLO",20.0,"FICCION","ALQUILER"
 						   .print("Concepto de libro tomado incluido");
 						   !devolver_libro; //Una vez que conoce al cajero, se le pone la necesidad de devolverle un libro
 						   .wait(2000). //Le envia el concepto de cajero
-
+						   
 						   
 +!at(cliente,P) : at(cliente,P) <- true.
 +!at(cliente,P) : not at(cliente,P)
@@ -37,15 +38,41 @@ libro_tomado.//(libro("REVERTE","ALATRISTE","BOLSILLO",20.0,"FICCION","ALQUILER"
 
 @a1 //Plan para devolver un libro
 +!devolver_libro : libro_tomado(INFO) & cajero(ID)<-// & info_libro(INFO)<- //Se se tiene el concepto de tener un libro
-	//.wait(2000);
 	!at(cliente,caja); //Surge el plan de moverse hacia la caja
 	colocar_libro(1,1,"caja",INFO); //Ejecutar la acción de colocar libro en la caja;
-	//.send(ID,tell,msg("Hola"));
+	-libro_tomado(INFO); //Se elimina la creencia del libro tomado
 	.send(ID,achieve,registrar_dev(INFO)); //Se le comunica al cajero el request de registrar la devolución
 	.print("Cliente : He solicitado la devolución de un libro");
 	.wait({+libro_devuelto}); //Se espera a que llegue la percepción de que el libro ha sido devuelto
 	-libro_devuelto; //Se elimina la percepción para el futuro
-	.print("Cliente : Fin a la devolución del libro"). //Termina la interacción.
+	.print("Cliente : Fin a la devolución del libro"); //Termina la interacción.
+	//------------------------//
+	.wait(1000); //Se espera un 1 segundo
+	.map.create(INFO_LIBRO); //Creación del map info_libro para la información del libro que se desea consultar
+	.map.put(INFO_LIBRO,autor,"GEORGE ORWELL");
+	.map.put(INFO_LIBRO,titulo,"1984");
+	!consultar_info(INFO_LIBRO). //Surge el plan de consultar información sobre un libro
+
+@a2 //Plan para preguntar información
++!consultar_info(INFO) : true <- 
+	.print("Cliente : Tengo el plan de consultar información sobre un libro");
+	.term2string(ZONA,"novela");
+	!conocer_asistente_zona(ZONA). //Se lanza el plan para conocer al asistente de zona del libro que se desea consultar
+	
+
+/*
+Plan para conocer a un asistente de zona. Se recibe como parametro de entrada : 
+zona : string que indica la zona especializada del asistente
+*/
++!conocer_asistente_zona(ZONA) : true <-
+								.wait(2000); //Espera 2 segundos
+								.df_search("asistente",ZONA,ID_ASISTENTE); //Se busca al asistente de dicha zona
+						   		.print("Cliente : Se ha conocido al asistente de la zona : ", ZONA);
+								.print("Cliente : Su ID es : ",ID_ASISTENTE);
+								+asistente(ID_ASISTENTE,ZONA); //Se añade la percepción del asistente
+								.print("Cliente : Se inicia movimiento hacia el asistente");
+								!at(cliente,ID_ASISTENTE);//Se le indica que se mueva hacia el asistente
+								.print("Cliebte : Estoy al lado del asistente").
 	
 +msg(M)[source(Ag)] :  true <- .print("Message from ",Ag,": ",M);-msg(M). //Para cuando llegue un mensaje
 

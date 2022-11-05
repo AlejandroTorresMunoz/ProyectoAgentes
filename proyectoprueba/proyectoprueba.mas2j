@@ -21,4 +21,6 @@ MAS proyectoprueba {
 
         cliente; //Agente cliente --> Id 1
 
+        asistente; //Agente asistente --> Id 2
+
 }

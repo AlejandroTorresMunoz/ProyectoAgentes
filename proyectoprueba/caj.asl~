@@ -20,13 +20,12 @@ pos_caj_dev(P) :- pos(P,0,0).
 @dev1 //Plan para cuando surja la necesidad de registrar la devolución de un libro
 +!registrar_dev(INFO) : msg(M)[source(Ag)] <-  //Si se da la condición de recibir la necesidad de registrar de una devolución, habiendo recibido un mensaje
 	.print("Cajero : Surge la necesidad de registrar la devolución de un libro de : ",Ag);
+	.print("Cajero : El ID del clienbte que se hja recibido es : ", source(Ag));
 	.print("info : ",INFO);
-	tomar_libro(0,0,INFO). //PROBAR ESTA ACCIÓN
-	/*
-	tomar_libro(x_caj,y_caj,info_libro); //Se toma el libro
-	colocar_libro(info_libro,caj_dev); //Se coloca sobre el concepto del cajón de devoluciones 
-	.send
-	*/
+	tomar_libro(1,1,"caja",INFO); //Se toma el libro de la posición de la caja
+	colocar_libro(0,0,"cajon_dev",INFO); //Se coloca el libro en el cajón de devoluciones
+	.wait(2000); //Se simula un retraso de 2 segundos antes de informar del concepto de que el libro ha sido devuelto
+	.send(Ag,tell,libro_devuelto). //Se le informa al cliente de que el libro ha sido devuelto
 	
 
 
