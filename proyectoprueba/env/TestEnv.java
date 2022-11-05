@@ -378,7 +378,7 @@ public class TestEnv extends Environment {
                     drawCajon(g,x,y);
             }
         }
-
+        //Función para dibujar un agente
         @Override
         public void drawAgent(Graphics g, int x, int y, Color c, int id)
         {
