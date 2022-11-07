@@ -35,18 +35,52 @@ import java.lang.reflect.Field;
 public class TestEnv extends Environment {
 
     //Definición de variables globales
-
-    class InfoLibro
+    /* 
+    public static class InfoLibro
     {
         //Clase para almacenar la información de un libro
         String autor;
         String titulo;
-        private InfoLibro(String[] valueStrings)
+        int NumEstanteria;
+        public  InfoLibro(String[] valueStrings)
         {
             //Constructor de la clase
             titulo = valueStrings[0];
             autor = valueStrings[1];
+            try
+            {
+                NumEstanteria = Integer.parseInt(valueStrings[2]);
+            }
+            catch (NumberFormatException e)
+            {
+                NumEstanteria = -1; //En caso de que el valor sea nulo, se le asigna un valor inexistente de estantería
+            }
+            
         }
+    }
+    */
+
+    public static class InfoLibro
+    {
+        //Clase para almacenar la información de un libro
+        String autor;
+        String titulo;
+        int NumEstanteria;
+        public  InfoLibro(HashMap<String,String> dict)
+        {
+            //Constructor de la clase
+            titulo = dict.get("titulo");
+            autor = dict.get("autor");
+            try
+            {
+                NumEstanteria = Integer.parseInt(dict.get("NumEstanteria"));
+            }
+            catch (NumberFormatException e)
+            {
+                NumEstanteria = -1; //En caso de que el valor sea nulo, se le asigna un valor inexistente de estantería
+            }
+            
+        } 
     }
 
 
@@ -57,7 +91,8 @@ public class TestEnv extends Environment {
     //ID's de los objetos --> IMPORTANTE : Por lo que parece, los objetos sólo pueden tener una ID que sea MULTIPLO DE 2
     public static final int CAJA = 16; //Código del objeto de la caja
     public static final int LIBRO = 32; //Código del objeto LIBRO
-    public static final int CAJON = 64; //Código del objeto de la caja
+    public static final int CAJON = 64; //Código del objeto del cajón de devoluciones
+    public static final int ESTANTERIA = 128; //Código del objeto estantería
 
     //Posición de los objetos
     public static final int pos_x_caja = 1; //Posición de la caja, en x
@@ -98,7 +133,7 @@ public class TestEnv extends Environment {
         //LocalMasClass = new BaseLocal(TestEnv.class.getName());
     }
 
-
+    
 
 
     @Override
@@ -112,22 +147,36 @@ public class TestEnv extends Environment {
         try{
             if(action.getFunctor().equals("colocar_libro"))
             {
-               //En el caso de que se trate de colocar un libro
-               int x = (int)((NumberTerm)action.getTerm(0)).solve(); //En primer parámetro de la función es la x
-               int y = (int)((NumberTerm)action.getTerm(1)).solve(); //El segundo parámetro de la función es la y
-               String tipo_objeto = (String)((StringTerm)action.getTerm(2)).getString(); //El tercer término es el tipo de objeto donde se deposita el libro
-               java.util.Collection<Term> valores = ((MapTerm)action.getTerm(3)).values(); //Valores recibidas
+                //En el caso de que se trate de colocar un libro
+                int x = (int)((NumberTerm)action.getTerm(0)).solve(); //En primer parámetro de la función es la x
+                int y = (int)((NumberTerm)action.getTerm(1)).solve(); //El segundo parámetro de la función es la y
+                String tipo_objeto = (String)((StringTerm)action.getTerm(2)).getString(); //El tercer término es el tipo de objeto donde se deposita el libro
+                java.util.Collection<Term> valores = ((MapTerm)action.getTerm(3)).values(); //Valores recibidas
+                java.util.Collection<Term> claves = ((MapTerm)action.getTerm(3)).keys(); //Claves recibidas
 
-               Object[] aux = valores.toArray(); //Array de objetos con los valores recibidos
-               String[] values = new String[aux.length]; //Array de strings donde se van a almacenar los valores recibidos
-               for(int i=0;i<aux.length;i++)
-               {
+                HashMap<String,String> mapa = new HashMap<String,String>();
+
+                for(int i=0;i<valores.size();i++)
+                {
+                    mapa.put(claves.toArray()[i].toString(),valores.toArray()[i].toString());
+                }
+
+
+                /* 
+                Object[] aux = valores.toArray(); //Array de objetos con los valores recibidos
+                String[] values = new String[aux.length]; //Array de strings donde se van a almacenar los valores recibidos
+                for(int i=0;i<aux.length;i++)
+                {
                    values[i] = aux[i].toString(); //Se guarda cada uno de los valores
-               }
+                }
+                */
 
-               InfoLibro info = new InfoLibro(values); //Clase para almacenar la información del libro
+                InfoLibro info = new InfoLibro(mapa); //Clase para almacenar la información del libro
+
+                logger.info("info.autor : "+info.autor);
+                logger.info("info.titulo : "+info.titulo);
                
-               model.colocarlibro(x, y, tipo_objeto, info); //Se ejecuta la acción
+                model.colocarlibro(x, y, tipo_objeto, info); //Se ejecuta la acción
             }
             else if(action.getFunctor().equals("tomar_libro"))
             {
@@ -138,14 +187,14 @@ public class TestEnv extends Environment {
                 java.util.Set<Term> claves = ((MapTerm)action.getTerm(3)).keys(); //Claves recibidas
                 java.util.Collection<Term> valores = ((MapTerm)action.getTerm(3)).values(); //Valores recibidas
 
-                Object[] aux = valores.toArray(); //Array de objetos con los valores recibidos
-                String[] values = new String[aux.length]; //Array de strings donde se van a almacenar los valores recibidos
-                for(int i=0;i<aux.length;i++)
+                HashMap<String,String> mapa = new HashMap<String,String>();
+
+                for(int i=0;i<valores.size();i++)
                 {
-                    values[i] = aux[i].toString(); //Se guarda cada uno de los valores
+                    mapa.put(claves.toArray()[i].toString(),valores.toArray()[i].toString());
                 }
 
-                InfoLibro info = new InfoLibro(values); //Clase para almacenar la información del libro
+                InfoLibro info = new InfoLibro(mapa); //Clase para almacenar la información del libro
 
                 model.tomar_libro(x, y, tipo_objeto, info); //Se toma el libro de la posición
                 addPercept(libro_depositado_caja); //Se añade la percepción de que se ha tomado el libro de la caja
@@ -170,6 +219,24 @@ public class TestEnv extends Environment {
                 }
                 model.moveTowards(dest);
 
+            }
+            else if(action.getFunctor().equals("consultar_estanteria"))
+            {
+                //Función para consultar la existencia de un libro dentro de las estanterías
+                java.util.Set<Term> claves = ((MapTerm)action.getTerm(0)).keys(); //Claves recibidas
+                java.util.Collection<Term> valores = ((MapTerm)action.getTerm(0)).values(); //Valores recibidas
+
+                HashMap<String,String> mapa = new HashMap<String,String>();
+
+                for(int i=0;i<valores.size();i++)
+                {
+                    mapa.put(claves.toArray()[i].toString(),valores.toArray()[i].toString());
+                }
+
+
+                InfoLibro info = new InfoLibro(mapa); //Clase para almacenar la información del libro
+                logger.info("EL TITULO ES : "+info.titulo);
+                model.consultar_estanteria(info); //Se ejecuta la acción de consultar si dicho libro existe en las librerías
             }
             else
             {

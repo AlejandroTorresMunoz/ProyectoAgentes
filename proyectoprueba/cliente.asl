@@ -21,8 +21,9 @@ libro_tomado.//(libro("REVERTE","ALATRISTE","BOLSILLO",20.0,"FICCION","ALQUILER"
 						   +cajero(ID_CAJERO); //Se añade la percepción del cajero
 						   .print("Concepto de ID_CAJERO incluido");
 						   .map.create(INFO_LIBRO); //Creación del map info_libro
-						   .map.put(INFO_LIBRO,autor,"REVERTE");
-						   .map.put(INFO_LIBRO,titulo,"ALATRISTE");
+						   .map.put(INFO_LIBRO,titulo,ALATRISTE);
+						   .map.put(INFO_LIBRO,autor,REVERTE);
+						   .map.put(INFO_LIBRO,NumEstanteria,null);
 						   +libro_tomado(INFO_LIBRO); //Se añade la posesión del libro
 						   .print("Concepto de libro tomado incluido");
 						   !devolver_libro; //Una vez que conoce al cajero, se le pone la necesidad de devolverle un libro
@@ -48,31 +49,27 @@ libro_tomado.//(libro("REVERTE","ALATRISTE","BOLSILLO",20.0,"FICCION","ALQUILER"
 	.print("Cliente : Fin a la devolución del libro"); //Termina la interacción.
 	//------------------------//
 	.wait(1000); //Se espera un 1 segundo
-	.map.create(INFO_LIBRO); //Creación del map info_libro para la información del libro que se desea consultar
-	.map.put(INFO_LIBRO,autor,"GEORGE ORWELL");
-	.map.put(INFO_LIBRO,titulo,"1984");
-	!consultar_info(INFO_LIBRO). //Surge el plan de consultar información sobre un libro
+	.map.create(INFO_LIBRO_2); //Creación del map info_libro
+	.map.put(INFO_LIBRO_2,autor,GEORGE_ORWELL);
+	.map.put(INFO_LIBRO_2,titulo,REBELION_EN_LA_GRANJA);
+	.map.put(INFO_LIBRO_2,NumEstanteria,null);
+	!consultar_info(INFO_LIBRO_2). //Surge el plan de consultar información sobre un libro
 
 @a2 //Plan para preguntar información
 +!consultar_info(INFO) : true <- 
 	.print("Cliente : Tengo el plan de consultar información sobre un libro");
 	.term2string(ZONA,"novela");
-	!conocer_asistente_zona(ZONA). //Se lanza el plan para conocer al asistente de zona del libro que se desea consultar
-	
+	.df_search("asistente",ZONA,ID_ASISTENTE); //Se busca al asistente de dicha zona
+	.print("Cliente : Se ha conocido al asistente de la zona : ", ZONA);
+	.print("Cliente : Su ID es : ",ID_ASISTENTE);
+	+asistente(ID_ASISTENTE,ZONA); //Se añade la percepción del asistente
+	.print("Cliente : Se inicia movimiento hacia el asistente");
+	!at(cliente,ID_ASISTENTE);//Se le indica que se mueva hacia el asistente
+	.print("Cliente : Estoy al lado del asistente");
+	.send(ID_ASISTENTE,askOne,libro_existente_area(INFO)). //Le pregunta al asistente de zona sobre la existencia del libro
 
-/*
-Plan para conocer a un asistente de zona. Se recibe como parametro de entrada : 
-zona : string que indica la zona especializada del asistente
-*/
-+!conocer_asistente_zona(ZONA) : true <-
-								.wait(2000); //Espera 2 segundos
-								.df_search("asistente",ZONA,ID_ASISTENTE); //Se busca al asistente de dicha zona
-						   		.print("Cliente : Se ha conocido al asistente de la zona : ", ZONA);
-								.print("Cliente : Su ID es : ",ID_ASISTENTE);
-								+asistente(ID_ASISTENTE,ZONA); //Se añade la percepción del asistente
-								.print("Cliente : Se inicia movimiento hacia el asistente");
-								!at(cliente,ID_ASISTENTE);//Se le indica que se mueva hacia el asistente
-								.print("Cliebte : Estoy al lado del asistente").
+
+
 	
 +msg(M)[source(Ag)] :  true <- .print("Message from ",Ag,": ",M);-msg(M). //Para cuando llegue un mensaje
 

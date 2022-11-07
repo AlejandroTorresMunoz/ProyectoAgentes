@@ -70,9 +70,9 @@ zona : string que indica la zona especializada del asistente
 						   		.print("Cliente : Se ha conocido al asistente de la zona : ", ZONA);
 								.print("Cliente : Su ID es : ",ID_ASISTENTE);
 								+asistente(ID_ASISTENTE,ZONA); //Se añade la percepción del asistente
-								obtener_pos_ag(2). //Se ejecuta la acción para conocer la posicíón del agente objetivo
-	
-
+								.print("Cliente : Se inicia movimiento hacia el asistente");
+								!at(cliente,ID_ASISTENTE);//Se le indica que se mueva hacia el asistente
+								.print("Cliebte : Estoy al lado del asistente").
 	
 +msg(M)[source(Ag)] :  true <- .print("Message from ",Ag,": ",M);-msg(M). //Para cuando llegue un mensaje
 

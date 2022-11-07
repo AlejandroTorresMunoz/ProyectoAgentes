@@ -12,6 +12,8 @@ public class TestView extends GridWorldView {
 
     TestModel tmodel;
 
+    private int num_estanteria; //Último número de estantería
+
     public TestView(TestModel model)
     {
         //Inicializador de la clase
@@ -26,6 +28,8 @@ public class TestView extends GridWorldView {
         defaultFont = new Font("Arial", Font.BOLD, 18); //Fuente con la que se pondrán los textos
         setVisible(true); //Activar la visibilidad de la ventana de la gráfica
         repaint(); //Actualización de todo el frame
+
+        num_estanteria = 0; //Se inicia el número de estantería
     }
 
     @Override
@@ -45,6 +49,11 @@ public class TestView extends GridWorldView {
             case TestEnv.CAJON:
                 //En el caso de que se tenga que dibujar el cajón
                 drawCajon(g,x,y);
+                break;
+            case TestEnv.ESTANTERIA:
+                //En el acso de que se tenga que dibujar una estantería
+                drawEstanteria(g,x,y);
+                break;
         }
     }
     //Función para dibujar un agente
@@ -81,6 +90,15 @@ public class TestView extends GridWorldView {
             g.setColor(Color.white);
             super.drawString(g, x, y, defaultFont, label);
         }
+    }
+
+    public void drawEstanteria(Graphics g, int x, int y)
+    {
+        //Función para dibujar la estantería
+        g.setColor(Color.BLUE);
+        super.drawObstacle(g, x, y);
+        g.setColor(Color.WHITE);
+        drawString(g,x,y,defaultFont, "Estanteria");
     }
 
     public void drawCaja(Graphics g, int x, int y)
