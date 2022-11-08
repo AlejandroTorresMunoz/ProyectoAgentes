@@ -8,10 +8,11 @@ import jason.environment.Environment; //Clase para el environment
 import jason.environment.grid.GridWorldModel;
 import jason.environment.grid.GridWorldView; //Clase para el mundo
 import jason.environment.grid.Location;
-
+import jason.asSemantics.*;
 import jason.mas2j.MAS2JProject;
 import jason.mas2j.AgentParameters;
 import jason.infra.local.BaseLocalMAS;
+import jason.stdlib.term2string;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -29,7 +30,6 @@ import java.lang.reflect.Type;
 import java.lang.reflect.Field;
 import java.util.logging.*;
 import java.lang.reflect.Field;
-
 
 
 public class TestEnv extends Environment {
@@ -117,7 +117,8 @@ public class TestEnv extends Environment {
     public static final Literal ad = Literal.parseLiteral("at(cliente,ID_ASISTENTE)"); //Percepcion de que el cliente se encuentra en la posición cercana al asistente de la zona
     public static final Literal cj = Literal.parseLiteral("at(cliente,caja)"); //Percepción de que el cliente se encuentra en la posición de la caja
     public static final Literal libro_devuelto = Literal.parseLiteral("libro_devuelto"); //Libro devuelto con éxito 
-
+    public static final Literal libro_existente_area = Literal.parseLiteral("libro_existente_area"); //Libro existente en la zona
+    public static final Literal libro_existente_estanteria = Literal.parseLiteral("libro_existente_estanteria");
 
     static Logger logger = Logger.getLogger(TestEnv.class.getName());
 
@@ -160,16 +161,6 @@ public class TestEnv extends Environment {
                 {
                     mapa.put(claves.toArray()[i].toString(),valores.toArray()[i].toString());
                 }
-
-
-                /* 
-                Object[] aux = valores.toArray(); //Array de objetos con los valores recibidos
-                String[] values = new String[aux.length]; //Array de strings donde se van a almacenar los valores recibidos
-                for(int i=0;i<aux.length;i++)
-                {
-                   values[i] = aux[i].toString(); //Se guarda cada uno de los valores
-                }
-                */
 
                 InfoLibro info = new InfoLibro(mapa); //Clase para almacenar la información del libro
 
@@ -235,8 +226,48 @@ public class TestEnv extends Environment {
 
 
                 InfoLibro info = new InfoLibro(mapa); //Clase para almacenar la información del libro
-                logger.info("EL TITULO ES : "+info.titulo);
-                model.consultar_estanteria(info); //Se ejecuta la acción de consultar si dicho libro existe en las librerías
+                TestModel.Estanteria est =  model.consultar_estanteria(info); //Se ejecuta la acción de consultar si dicho libro existe en las librerías
+                if(est==null)
+                {
+                    logger.info("No se ha encontrado el libro");
+                    addPercept("asistente",libro_existente_area.setNegated(true));
+                }
+                else
+                {
+                    logger.info("Se ha encontrado el libro");
+                    Literal lit_to_return = Literal.parseLiteral("libro_existente_estanteria");
+
+                    /*
+                     * TransitionSystem es el sistema del agente
+                     */
+                    
+                    //logger.info("Tipo : "+aux.getClass().getName());
+                    //logger.info("Max args : "+Integer.toString(aux.getMaxArgs()));
+                    //aux.execute()
+                    //term2string.term2string(term_clave1,"ab");
+                    
+                    //accionador.
+                    //term2string(term_clave1,"ab");
+                    //term2string(term_valor1,"cd");
+                    //map_aux.put(term_clave1,term_valor1);
+               
+                    //lit_to_return.addTerm()
+                    //Literal creencia = 
+                    MapTermImpl aux = new MapTermImpl();
+                    Term term_clave;
+                    term2string accion = new term2string();
+                    TransitionsSystem ts = new TransitionSystem();
+                    logger.info("Numero de argumentos : "+Integer.toString(accion.getMaxArgs()));
+                    //term2string(term_clave,"autor");
+                    //aux.put(((StringTerm)"autor"),((StringTerm)"CELA"));
+                    /* 
+                    Term clave1;
+                    Term valor1;
+                    aux.put(clave1, valor1);
+                    */
+                    libro_existente_estanteria.addTerm(aux);
+                    addPercept("asistente",libro_existente_estanteria);
+                }
             }
             else
             {
@@ -298,6 +329,7 @@ public class TestEnv extends Environment {
         }
 
     }
+
 
 
     /** Called before the end of MAS execution */

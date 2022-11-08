@@ -211,23 +211,23 @@ public class TestModel extends GridWorldModel {
             return getAgPos(id);
         }
 
-        boolean consultar_estanteria(TestEnv.InfoLibro info)
+        Estanteria consultar_estanteria(TestEnv.InfoLibro info)
         {
             //Función para consultar si un libro existe o no sobre las estanterías
             //Devuelve true en caso de que exista, o false en caso contrario
-            TestEnv.logger.info("El número de estanterías es : "+ Integer.toString(array_estanterias.length));
-            TestEnv.logger.info("El libro que se consulta es : "+info.titulo);
-            TestEnv.logger.info("Longitud de info : "+info.titulo.length());
+            //TestEnv.logger.info("El número de estanterías es : "+ Integer.toString(array_estanterias.length));
+            //TestEnv.logger.info("El libro que se consulta es : "+info.titulo);
+            //TestEnv.logger.info("Longitud de info : "+info.titulo.length());
             int num_estanterias = array_estanterias.length; //Número de estanterías
 
             boolean existe = false; //Valor a devolver. Sólo será true si se encuentra el título del libro
-            
+            Estanteria est_to_return = null;
             for(int num_est=0;num_est<num_estanterias;num_est++)
             {
                 //Se consulta cada una de las estanterías
                 Estanteria est_consulta = array_estanterias[num_est]; //Se obtiene la estantería
                 int num_libros = est_consulta.libros.length; //Se obtiene el número de libros almacenados en la estantería
-                TestEnv.logger.info("Se está consultando la estantería : "+Integer.toString(num_est));
+                //TestEnv.logger.info("Se está consultando la estantería : "+Integer.toString(num_est));
                 for(int num_libro=0;num_libro<num_libros;num_libro++)
                 {
                     //Se consulta cada uno de los libros de la estantería actual
@@ -235,12 +235,14 @@ public class TestModel extends GridWorldModel {
 
                     if(Objects.equals(libro_consulta.titulo, info.titulo))
                     {
-                        TestEnv.logger.info("Se ha encontrado el libro");
+                        //TestEnv.logger.info("Se ha encontrado el libro");
                         existe = true;
+                        est_to_return = est_consulta;
+                        break;
                     }
                 }
             } 
             
-            return true;
+            return est_to_return;
         }
 }

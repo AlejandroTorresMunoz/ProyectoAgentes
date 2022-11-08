@@ -19,5 +19,11 @@
 	.print("Asistente : He recibido un mensaje de : ",Ag); 
 	consultar_estanteria(INFO). //Lanza la acción de consultar la estantería 
 					
+-libro_existente_area : true <-
+	.print("Asistente : No se conoce el libro").
+	
++libro_existente_estanteria(INFO) : true <-
+	.print("Asistente : Se conoce el libro");
+	.print("Valor : ",.INFO.get(autor)).
 					
 +msg(M)[source(Ag)] :  true <- .print("Message from ",Ag,": ",M);-msg(M). //Para cuando llegue un mensaje
