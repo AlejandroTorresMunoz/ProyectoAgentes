@@ -68,8 +68,12 @@ libro_tomado.//(libro("REVERTE","ALATRISTE","BOLSILLO",20.0,"FICCION","ALQUILER"
 	.print("Cliente : Estoy al lado del asistente");
 	.send(ID_ASISTENTE,askOne,libro_existente_area(INFO)). //Le pregunta al asistente de zona sobre la existencia del libro
 
-
-
+//En el caso de que se le comunique que no existe el libro que ha preguntado
++libro_no_existente_area(INFO) : true <-
+	.print("Cliente : Se me ha comunicado que no existe el libro"). 
+	
++libro_existente_estanteria(INFO,ESTANTERIA) : true <-
+	.print("Cliente : Se me ha comunicado que existe el libro").
 	
 +msg(M)[source(Ag)] :  true <- .print("Message from ",Ag,": ",M);-msg(M). //Para cuando llegue un mensaje
 

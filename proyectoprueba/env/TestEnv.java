@@ -118,6 +118,7 @@ public class TestEnv extends Environment {
     public static final Literal cj = Literal.parseLiteral("at(cliente,caja)"); //Percepción de que el cliente se encuentra en la posición de la caja
     public static final Literal libro_devuelto = Literal.parseLiteral("libro_devuelto"); //Libro devuelto con éxito 
     public static final Literal libro_existente_area = Literal.parseLiteral("libro_existente_area"); //Libro existente en la zona
+    public static final Literal libro_no_existente_area = Literal.parseLiteral("libro_no_existente_area"); //Libro existente en la zona
     public static final Literal libro_existente_estanteria = Literal.parseLiteral("libro_existente_estanteria");//(posx,posy)");
 
     static Logger logger = Logger.getLogger(TestEnv.class.getName());
@@ -216,8 +217,10 @@ public class TestEnv extends Environment {
                 //Función para consultar la existencia de un libro dentro de las estanterías
                 java.util.Set<Term> claves = ((MapTerm)action.getTerm(0)).keys(); //Claves recibidas
                 java.util.Collection<Term> valores = ((MapTerm)action.getTerm(0)).values(); //Valores recibidas
+                String agente_a_responder = action.getTerm(1).toString(); //Agente al que se le debe responder
+                logger.info("El agente al que se debe responder es : "+agente_a_responder);
 
-                HashMap<String,String> mapa = new HashMap<String,String>();
+                HashMap<String,String> mapa = new HashMap<String,String>(); //Mapa para almacenar los valores de InfoLibro
 
                 for(int i=0;i<valores.size();i++)
                 {
@@ -230,60 +233,68 @@ public class TestEnv extends Environment {
                 if(est==null)
                 {
                     logger.info("No se ha encontrado el libro");
-                    MapTermImpl mapa_info = new MapTermImpl();
+                    MapTermImpl INFO_MAP = new MapTermImpl(); //Mapa del concepto Info_Libro que se va a devolver
+                    
+                    //Se introduce el término del autor
                     StringTermImpl clave_autor = new StringTermImpl("autor");
                     StringTermImpl valor_autor = new StringTermImpl(info.autor);
-                    mapa_info.put(clave_autor,valor_autor);
-                    addPercept("asistente",libro_existente_area.setNegated(true));
+                    INFO_MAP.put(clave_autor,valor_autor);
+                    //Se introduce el término del título
+                    StringTermImpl clave_titulo = new StringTermImpl("titulo");
+                    StringTermImpl valor_titulo = new StringTermImpl(info.titulo);
+                    INFO_MAP.put(clave_titulo,valor_titulo);
+                    //Se intoruce el término del número de estantería
+                    StringTermImpl clave_estanteria = new StringTermImpl("NumEstanteria");
+                    StringTermImpl valor_estanteria = new StringTermImpl(Integer.toString(info.NumEstanteria));
+                    INFO_MAP.put(clave_estanteria,valor_estanteria);
+
+                    libro_no_existente_area.clearAnnots(); //Se eliminan los posibles términos que pudiera contener la creencia
+                    
+                    //Se añade el término de InfoLibro a la creencia
+                    libro_no_existente_area.addTerm(INFO_MAP);
+                    //Se añade el término del agente al que responder
+                    StringTermImpl Ag = new StringTermImpl(agente_a_responder);
+                    libro_no_existente_area.addTerm(Ag);
+                    //Se añade la creencia
+                    addPercept("asistente",libro_no_existente_area);
+                    //libro_no_existente_area.delTerm(0);
                 }
                 else
                 {
                     logger.info("Se ha encontrado el libro");
-                    //Literal lit_to_return = Literal.parseLiteral("libro_existente_estanteria");
 
-                    /*
-                     * TransitionSystem es el sistema del agente
-                     */
+                    MapTermImpl INFO_MAP = new MapTermImpl(); //Mapa del concepto Info_Libro que se va a devolver
+                    MapTermImpl ESTANTERIA_MAP = new MapTermImpl(); //Mapa del concepto Estanteria que se va a devolver
+
+                    //Se define el concepto del Info_Libro
+                    //Se introduce el término del autor
+                    StringTermImpl clave_autor = new StringTermImpl("autor");
+                    StringTermImpl valor_autor = new StringTermImpl(info.autor);
+                    INFO_MAP.put(clave_autor,valor_autor);
+                    //Se introduce el término del título
+                    StringTermImpl clave_titulo = new StringTermImpl("titulo");
+                    StringTermImpl valor_titulo = new StringTermImpl(info.titulo);
+                    INFO_MAP.put(clave_titulo,valor_titulo);
+                    //Se intoruce el término del número de estantería
+                    StringTermImpl clave_estanteria = new StringTermImpl("NumEstanteria");
+                    StringTermImpl valor_estanteria = new StringTermImpl(Integer.toString(info.NumEstanteria));
+                    INFO_MAP.put(clave_estanteria,valor_estanteria);  
                     
-                    //logger.info("Tipo : "+aux.getClass().getName());
-                    //logger.info("Max args : "+Integer.toString(aux.getMaxArgs()));
-                    //aux.execute()
-                    //term2string.term2string(term_clave1,"ab");
-                    
-                    //accionador.
-                    //term2string(term_clave1,"ab");
-                    //term2string(term_valor1,"cd");
-                    //map_aux.put(term_clave1,term_valor1);
-               
-                    //lit_to_return.addTerm()
-                    //Literal creencia = 
-                    
-                    
-                    //MapTermImpl aux = new MapTermImpl();
-                    //StringTermImpl tAsString = new StringTermImpl();
-                    StringTermImpl POSX = new StringTermImpl(Integer.toString(est.pos_estanteria_.x)); //Valor de la posición x de la estantería
-                    StringTermImpl POSY = new StringTermImpl(Integer.toString(est.pos_estanteria_.y)); //Valor de la posición y de la estantería
-                    
-                    
-                    //Unifier un = new Unifier(); //Unificador
-                    //boolean resultado = un.unifies(tAsString,POSX);
-                    //logger.info("Resultado de la unión : "+Boolean.toString(resultado));
-                    //logger.info("Valor de la cadena tras unificador : "+tAsString.getString());
-                    //logger.info("Valor de la cadena origen : "+POSX.toString());
-                    
-                    //term2string(term_clave,"autor");
-                    //aux.put(((StringTerm)"autor"),((StringTerm)"CELA"));
-                    /* 
-                    Term clave1;
-                    Term valor1;
-                    aux.put(clave1, valor1);
-                    */
-                    /*
-                    libro_existente_estanteria.addTerm(POSX); //Se le añade el término de la posición x
-                    libro_existente_estanteria.addTerm(posy); //Se le añade el término de la posición y
-                    */
-                    libro_existente_estanteria.addTerm(POSX);
-                    libro_existente_estanteria.addTerm(POSY);
+                    //Se define el concepto de la Estanteria
+                    //Se introduce el término del id
+                    StringTermImpl clave_id = new StringTermImpl("id");
+                    StringTermImpl valor_id = new StringTermImpl(Integer.toString(est.id_));
+                    ESTANTERIA_MAP.put(clave_id,valor_id);
+
+                    libro_existente_estanteria.clearAnnots(); //Se eliminan los posibles términos que pudiera contener la creencia
+
+                    libro_existente_estanteria.addTerm(INFO_MAP); //Se añade el término del Info_Libro
+
+                    libro_existente_estanteria.addTerm(ESTANTERIA_MAP); //Se añade el término de la Estanteria
+                    //Se añade el término del agente al que responder
+                    StringTermImpl Ag = new StringTermImpl(agente_a_responder);
+                    libro_existente_estanteria.addTerm(Ag);
+
                     addPercept("asistente",libro_existente_estanteria);
                 }
             }
