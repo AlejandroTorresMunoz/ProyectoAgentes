@@ -230,7 +230,10 @@ public class TestEnv extends Environment {
                 if(est==null)
                 {
                     logger.info("No se ha encontrado el libro");
-                    
+                    MapTermImpl mapa_info = new MapTermImpl();
+                    StringTermImpl clave_autor = new StringTermImpl("autor");
+                    StringTermImpl valor_autor = new StringTermImpl(info.autor);
+                    mapa_info.put(clave_autor,valor_autor);
                     addPercept("asistente",libro_existente_area.setNegated(true));
                 }
                 else
