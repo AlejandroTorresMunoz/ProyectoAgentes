@@ -22,8 +22,9 @@
 -libro_existente_area : true <-
 	.print("Asistente : No se conoce el libro").
 	
-+libro_existente_estanteria(INFO) : true <-
++libro_existente_estanteria(POSX,POSY) : true <-
 	.print("Asistente : Se conoce el libro");
-	.print("Valor : ",.INFO.get(autor)).
+	.print("Asistente : El valor de x recibido es : ",POSX);
+	.print("Asistente : El valor de y recibido es : ",POSY).
 					
 +msg(M)[source(Ag)] :  true <- .print("Message from ",Ag,": ",M);-msg(M). //Para cuando llegue un mensaje

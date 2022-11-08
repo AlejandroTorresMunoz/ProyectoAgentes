@@ -118,7 +118,7 @@ public class TestEnv extends Environment {
     public static final Literal cj = Literal.parseLiteral("at(cliente,caja)"); //Percepción de que el cliente se encuentra en la posición de la caja
     public static final Literal libro_devuelto = Literal.parseLiteral("libro_devuelto"); //Libro devuelto con éxito 
     public static final Literal libro_existente_area = Literal.parseLiteral("libro_existente_area"); //Libro existente en la zona
-    public static final Literal libro_existente_estanteria = Literal.parseLiteral("libro_existente_estanteria");
+    public static final Literal libro_existente_estanteria = Literal.parseLiteral("libro_existente_estanteria");//(posx,posy)");
 
     static Logger logger = Logger.getLogger(TestEnv.class.getName());
 
@@ -230,12 +230,13 @@ public class TestEnv extends Environment {
                 if(est==null)
                 {
                     logger.info("No se ha encontrado el libro");
+                    
                     addPercept("asistente",libro_existente_area.setNegated(true));
                 }
                 else
                 {
                     logger.info("Se ha encontrado el libro");
-                    Literal lit_to_return = Literal.parseLiteral("libro_existente_estanteria");
+                    //Literal lit_to_return = Literal.parseLiteral("libro_existente_estanteria");
 
                     /*
                      * TransitionSystem es el sistema del agente
@@ -253,11 +254,20 @@ public class TestEnv extends Environment {
                
                     //lit_to_return.addTerm()
                     //Literal creencia = 
-                    MapTermImpl aux = new MapTermImpl();
-                    Term term_clave;
-                    term2string accion = new term2string();
-                    TransitionsSystem ts = new TransitionSystem();
-                    logger.info("Numero de argumentos : "+Integer.toString(accion.getMaxArgs()));
+                    
+                    
+                    //MapTermImpl aux = new MapTermImpl();
+                    //StringTermImpl tAsString = new StringTermImpl();
+                    StringTermImpl POSX = new StringTermImpl(Integer.toString(est.pos_estanteria_.x)); //Valor de la posición x de la estantería
+                    StringTermImpl POSY = new StringTermImpl(Integer.toString(est.pos_estanteria_.y)); //Valor de la posición y de la estantería
+                    
+                    
+                    //Unifier un = new Unifier(); //Unificador
+                    //boolean resultado = un.unifies(tAsString,POSX);
+                    //logger.info("Resultado de la unión : "+Boolean.toString(resultado));
+                    //logger.info("Valor de la cadena tras unificador : "+tAsString.getString());
+                    //logger.info("Valor de la cadena origen : "+POSX.toString());
+                    
                     //term2string(term_clave,"autor");
                     //aux.put(((StringTerm)"autor"),((StringTerm)"CELA"));
                     /* 
@@ -265,7 +275,12 @@ public class TestEnv extends Environment {
                     Term valor1;
                     aux.put(clave1, valor1);
                     */
-                    libro_existente_estanteria.addTerm(aux);
+                    /*
+                    libro_existente_estanteria.addTerm(POSX); //Se le añade el término de la posición x
+                    libro_existente_estanteria.addTerm(posy); //Se le añade el término de la posición y
+                    */
+                    libro_existente_estanteria.addTerm(POSX);
+                    libro_existente_estanteria.addTerm(POSY);
                     addPercept("asistente",libro_existente_estanteria);
                 }
             }
