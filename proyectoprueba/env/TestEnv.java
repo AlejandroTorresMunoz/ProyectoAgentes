@@ -174,8 +174,6 @@ public class TestEnv extends Environment {
 
                 InfoLibro info = new InfoLibro(mapa); //Clase para almacenar la información del libro
 
-                logger.info("info.autor : "+info.autor);
-                logger.info("info.titulo : "+info.titulo);
                
                 model.colocarlibro(x, y, tipo_objeto, info); //Se ejecuta la acción
             }
@@ -202,30 +200,6 @@ public class TestEnv extends Environment {
             
                 
             }
-            else if (action.getFunctor().equals("move_towards")) 
-            {
-
-                String l = action.getTerm(0).toString(); //Se almacena el objeto hacia el que se desea mover 
-                Location dest = null;
-                logger.info("move_towards: valor de l : "+l);
-                if(l.equals(new String("caja")))
-                {
-                    //Se mueve hacia la posición de la caja
-                    dest = lcaja_delante;
-                }
-                else if(l.equals(new String("[asistente]")))
-                {
-                    //Se mueve hacia la posición del asistente
-                    dest = model.getAgPos(2);
-                    dest.x = dest.x-1;
-                }
-                else if(l.equals(new String("1")))
-                {
-                    logger.info("Se ha recibido la orden movimiento hacia la estantería.");
-                }
-                model.moveTowards(dest);
-
-            }
             else if(action.getFunctor().equals("movimiento_hacia"))
             {
                 //Función para moverse hacia una posición dados x e y como términos
@@ -240,7 +214,6 @@ public class TestEnv extends Environment {
                 java.util.Set<Term> claves = ((MapTerm)action.getTerm(0)).keys(); //Claves recibidas
                 java.util.Collection<Term> valores = ((MapTerm)action.getTerm(0)).values(); //Valores recibidas
                 String agente_a_responder = action.getTerm(1).toString(); //Agente al que se le debe responder
-                logger.info("El agente al que se debe responder es : "+agente_a_responder);
 
                 HashMap<String,String> mapa = new HashMap<String,String>(); //Mapa para almacenar los valores de InfoLibro
 
@@ -362,8 +335,8 @@ public class TestEnv extends Environment {
         addPercept("cliente",position_client);
 
         //Se actualiza la posición de la caja
-        Literal pos_caja = Literal.parseLiteral("pos(caja,"+lcaja_delante.x+","+lcaja_delante.y+")");
-        addPercept("cliente",pos_caja);
+        Literal pos_caja_del = Literal.parseLiteral("pos(caja_del,"+lcaja_delante.x+","+lcaja_delante.y+")");
+        addPercept("cliente",pos_caja_del);
         //Se actualiza la posición del asistente
         Location position_assistent =   model.getAgPos(2);
         Literal pos_assistent = Literal.parseLiteral("pos(asistente,"+position_assistent.x+","+position_assistent.y+")");

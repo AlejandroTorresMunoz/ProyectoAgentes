@@ -39,8 +39,8 @@
 
 @a1 //Plan para devolver un libro
 +!devolver_libro : libro_tomado(INFO) & cajero(ID)<-// & info_libro(INFO)<- //Se se tiene el concepto de tener un libro
-	?pos(caja,X_CAJA,Y_CAJA);
-	!go(X_CAJA,Y_CAJA);
+	?pos(caja_del,X_CAJA_DEL,Y_CAJA_DEL);
+	!go(X_CAJA_DEL,Y_CAJA_DEL);
 	colocar_libro(1,1,"caja",INFO); //Ejecutar la acción de colocar libro en la caja;
 	-libro_tomado(INFO); //Se elimina la creencia del libro tomado
 	.send(ID,achieve,registrar_dev(INFO)); //Se le comunica al cajero el request de registrar la devolución
@@ -76,8 +76,8 @@
 	.map.get(ESTANTERIA,"id",ID_EST); //Se guarda el valor de la ID de la estantería hacia la que moverse
 	.print("Cliente : Valor de la id de la estanteria : ",ID_EST);
 	?pos(ID_EST,X_EST,Y_EST);
-	!go(X_EST,Y_EST);
-	.print("Cliente : Objetivo establecido para moverse hacia la estanteria").
+	!go(X_EST,Y_EST).
+	
 	
 +msg(M)[source(Ag)] :  true <- .print("Message from ",Ag,": ",M);-msg(M). //Para cuando llegue un mensaje
 
