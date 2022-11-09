@@ -305,7 +305,8 @@ public class TestEnv extends Environment {
                     //Se define el concepto de la Estanteria
                     //Se introduce el término del id
                     StringTermImpl clave_id = new StringTermImpl("id");
-                    StringTermImpl valor_id = new StringTermImpl(Integer.toString(est.id_));
+                    //StringTermImpl valor_id = new StringTermImpl(Integer.toString(est.id_));
+                    NumberTermImpl valor_id = new NumberTermImpl(est.id_);
                     ESTANTERIA_MAP.put(clave_id,valor_id);
 
                     libro_existente_estanteria.clearAnnots(); //Se eliminan los posibles términos que pudiera contener la creencia
@@ -348,17 +349,9 @@ public class TestEnv extends Environment {
     {
         //Función para actualizar la percepción de todos los agentes
         clearPercepts(); //Función que limpia la lista de percepciones de manera global
-        
-        Location cajeroLoc = model.getAgPos(0); //Actualizar el conocimiento de la posición del agente 0
-        Location asistenteLoc = model.getAgPos(2); //Actualizar el conocimiento de la posición del agente 2
 
-        Literal poscajero = Literal.parseLiteral("pos(cajero," + cajeroLoc.x + "," + cajeroLoc.y + ")"); //Predicado de la posición del cajero
-        addPercept(poscajero); //Se añade la percepción de la posición del cajero
-        //Percepciones que son fijas
         Location cajaLoc = new Location(pos_x_caja, pos_y_caja); //Localización de la caja
-
-
-        //PRUEBA NUEVA
+        
         //Se actualiza la posición del cliente
         Location lcliente = model.getAgPos(1); //Se añade la percepción del cliente 
         Literal position_client = Literal.parseLiteral("posicion");
@@ -376,14 +369,13 @@ public class TestEnv extends Environment {
         Literal pos_assistent = Literal.parseLiteral("pos(asistente,"+position_assistent.x+","+position_assistent.y+")");
         addPercept("cliente",pos_assistent);
         //Se actualiza la posición de la estantería 0
-        Literal pos_est_0 = Literal.parseLiteral("pos("+Integer.toString(0)+","+est0_delante.x+","+est0_delante.y+")");
+        Literal pos_est_0 = Literal.parseLiteral("pos(0,"+est0_delante.x+","+est0_delante.y+")");
         addPercept("cliente",pos_est_0);
         //Se actualiza la posición de la estantería 1
-        Literal pos_est_1 = Literal.parseLiteral("pos("+Integer.toString(1)+","+est1_delante.x+","+est1_delante.y+")");
+        Literal pos_est_1 = Literal.parseLiteral("pos(1,"+est1_delante.x+","+est1_delante.y+")");
         addPercept("cliente",pos_est_1);
 
-        //removePercept("cliente",poscliente);
-        //addPercept("cliente",poscliente); //Se le añade la percepción al cliente 
+
         
 
         if(model.hasObject(LIBRO, cajaLoc))
@@ -396,28 +388,8 @@ public class TestEnv extends Environment {
             removePercept(libro_depositado_caja);
         }
 
-        // Se añade la percepción al cliente de la posición de la caja
-        if (lcliente.equals(lcaja_delante)) {
-            //En el caso de que la posición del cliente sea la de la caja
-            addPercept("cliente", cj); //Se le añade la percepción de de que se encuentra en la caja
-        }
-        else
-        {
-            removePercept("cliente", cj);
-        }
 
-        if(lcliente.distance(asistenteLoc) < 2)
-        {
-            //Si el cliente se encuentra a menos de 1 del asistente
-            addPercept("cliente", ad);
-        }
-        else
-        {
-            removePercept("cliente", ad);
-        }
 
-        //logger.info("El valor de la creencia ad : "+Boolean.toString(containsPercept​("cliente",ad)));
-        //logger.info("El valor de la creencia cj : "+Boolean.toString(containsPercept​("cliente",cj)));
     }
 
 

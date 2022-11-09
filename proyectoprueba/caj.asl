@@ -18,7 +18,7 @@ pos_caj_dev(P) :- pos(P,0,0).
 +msg(M)[source(Ag)] :  true <- .print("Message from ",Ag,": ",M);-msg(M). //Para cuando llegue un mensaje
 
 @dev1 //Plan para cuando surja la necesidad de registrar la devolución de un libro
-+!registrar_dev(INFO) : msg(M)[source(Ag)] <-  //Si se da la condición de recibir la necesidad de registrar de una devolución, habiendo recibido un mensaje
++!registrar_dev(INFO) : msg(M)[source(Ag)] & libro_depositado(caja)<-  //Si se da la condición de recibir la necesidad de registrar de una devolución, habiendo recibido un mensaje
 	.print("Cajero : Surge la necesidad de registrar la devolución de un libro de : ",Ag);
 	.print("Cajero : El ID del clienbte que se hija recibido es : ", source(Ag));
 	.print("info : ",INFO);
@@ -29,5 +29,5 @@ pos_caj_dev(P) :- pos(P,0,0).
 	
 
 
-+libro_depositado(caja) : true <- .print("Cajero : Se ha encontrado un libro en la caja"). //En el caso de que tenga la percepción de que se ha depositado un libro en la caja
+//+libro_depositado(caja) : true <- .print("Cajero : Se ha encontrado un libro en la caja"). //En el caso de que tenga la percepción de que se ha depositado un libro en la caja
  
