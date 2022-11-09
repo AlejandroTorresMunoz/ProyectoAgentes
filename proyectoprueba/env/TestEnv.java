@@ -19,6 +19,9 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.util.Random;
 import java.util.logging.Logger;
+
+import javax.sound.sampled.FloatControl;
+
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
@@ -35,50 +38,38 @@ import java.lang.reflect.Field;
 public class TestEnv extends Environment {
 
     //Definición de variables globales
-    /* 
-    public static class InfoLibro
-    {
-        //Clase para almacenar la información de un libro
-        String autor;
-        String titulo;
-        int NumEstanteria;
-        public  InfoLibro(String[] valueStrings)
-        {
-            //Constructor de la clase
-            titulo = valueStrings[0];
-            autor = valueStrings[1];
-            try
-            {
-                NumEstanteria = Integer.parseInt(valueStrings[2]);
-            }
-            catch (NumberFormatException e)
-            {
-                NumEstanteria = -1; //En caso de que el valor sea nulo, se le asigna un valor inexistente de estantería
-            }
-            
-        }
-    }
-    */
 
     public static class InfoLibro
     {
         //Clase para almacenar la información de un libro
         String autor;
         String titulo;
-        int NumEstanteria;
+        int numestanteria;
+        float precio;
         public  InfoLibro(HashMap<String,String> dict)
         {
             //Constructor de la clase
             titulo = dict.get("titulo");
             autor = dict.get("autor");
+            
             try
             {
-                NumEstanteria = Integer.parseInt(dict.get("NumEstanteria"));
+                numestanteria = Integer.parseInt(dict.get("numestanteria"));
             }
             catch (NumberFormatException e)
             {
-                NumEstanteria = -1; //En caso de que el valor sea nulo, se le asigna un valor inexistente de estantería
+                numestanteria = -1; //En caso de que el valor sea nulo, se le asigna un valor inexistente de estantería
             }
+            
+            try
+            {
+                precio = Float.parseFloat(dict.get("precio"));
+            }
+            catch (NumberFormatException e)
+            {
+                precio = -1;
+            }
+
             
         } 
     }
@@ -122,13 +113,16 @@ public class TestEnv extends Environment {
     //Definición de predicados
     public static final Literal libro_depositado_caja = Literal.parseLiteral("libro_depositado(caja)"); //Lirbo depositado sobre caja
     public static final Literal libro_tomado_caja = Literal.parseLiteral("libro_tomado(caja)"); //Libro tomado de la caja
-    public static final Literal ad = Literal.parseLiteral("at(cliente,ID_ASISTENTE)"); //Percepcion de que el cliente se encuentra en la posición cercana al asistente de la zona
-    public static final Literal cj = Literal.parseLiteral("at(cliente,caja)"); //Percepción de que el cliente se encuentra en la posición de la caja
-    public static final Literal ae = Literal.parseLiteral("at(cliente,ID_EST)"); //Percepción de que el cliente se encuentra en la posición de la estantería recibida
+    //public static final Literal ad = Literal.parseLiteral("at(cliente,ID_ASISTENTE)"); //Percepcion de que el cliente se encuentra en la posición cercana al asistente de la zona
+    //public static final Literal cj = Literal.parseLiteral("at(cliente,caja)"); //Percepción de que el cliente se encuentra en la posición de la caja
+    //public static final Literal ae = Literal.parseLiteral("at(cliente,ID_EST)"); //Percepción de que el cliente se encuentra en la posición de la estantería recibida
     public static final Literal libro_devuelto = Literal.parseLiteral("libro_devuelto"); //Libro devuelto con éxito 
-    public static final Literal libro_existente_area = Literal.parseLiteral("libro_existente_area"); //Libro existente en la zona
+    //public static final Literal libro_existente_area = Literal.parseLiteral("libro_existente_area"); //Libro existente en la zona
     public static final Literal libro_no_existente_area = Literal.parseLiteral("libro_no_existente_area"); //Libro existente en la zona
     public static final Literal libro_existente_estanteria = Literal.parseLiteral("libro_existente_estanteria");//(posx,posy)");
+    public static final Literal dinero_suficiente = Literal.parseLiteral("dinero_suficiente"); //Dinero suficinete
+	public static final Literal dinero_no_suficiente = Literal.parseLiteral("dinero_no_suficiente"); //Dinero Insuficiente
+
 
     static Logger logger = Logger.getLogger(TestEnv.class.getName());
 
@@ -159,11 +153,11 @@ public class TestEnv extends Environment {
             if(action.getFunctor().equals("colocar_libro"))
             {
                 //En el caso de que se trate de colocar un libro
-                int x = (int)((NumberTerm)action.getTerm(0)).solve(); //En primer parámetro de la función es la x
-                int y = (int)((NumberTerm)action.getTerm(1)).solve(); //El segundo parámetro de la función es la y
-                String tipo_objeto = (String)((StringTerm)action.getTerm(2)).getString(); //El tercer término es el tipo de objeto donde se deposita el libro
-                java.util.Collection<Term> valores = ((MapTerm)action.getTerm(3)).values(); //Valores recibidas
-                java.util.Collection<Term> claves = ((MapTerm)action.getTerm(3)).keys(); //Claves recibidas
+                //int x = (int)((NumberTerm)action.getTerm(0)).solve(); //En primer parámetro de la función es la x
+                //int y = (int)((NumberTerm)action.getTerm(1)).solve(); //El segundo parámetro de la función es la y
+                String tipo_objeto = (String)((StringTerm)action.getTerm(0)).getString(); //El tercer término es el tipo de objeto donde se deposita el libro
+                java.util.Collection<Term> valores = ((MapTerm)action.getTerm(1)).values(); //Valores recibidas
+                java.util.Collection<Term> claves = ((MapTerm)action.getTerm(1)).keys(); //Claves recibidas
 
                 HashMap<String,String> mapa = new HashMap<String,String>();
 
@@ -175,16 +169,16 @@ public class TestEnv extends Environment {
                 InfoLibro info = new InfoLibro(mapa); //Clase para almacenar la información del libro
 
                
-                model.colocarlibro(x, y, tipo_objeto, info); //Se ejecuta la acción
+                model.colocarlibro(tipo_objeto, info); //Se ejecuta la acción
             }
             else if(action.getFunctor().equals("tomar_libro"))
             {
                 //En el caso de que se trate de la acción de tomar un libro
-                int x = (int)((NumberTerm)action.getTerm(0)).solve(); //En primer parámetro de la función es la x
-                int y = (int)((NumberTerm)action.getTerm(1)).solve(); //El segundo parámetro de la función es la y
-                String tipo_objeto = (String)((StringTerm)action.getTerm(2)).getString(); //El tercer término es el tipo de objeto donde se deposita el libro
-                java.util.Set<Term> claves = ((MapTerm)action.getTerm(3)).keys(); //Claves recibidas
-                java.util.Collection<Term> valores = ((MapTerm)action.getTerm(3)).values(); //Valores recibidas
+                //int x = (int)((NumberTerm)action.getTerm(0)).solve(); //En primer parámetro de la función es la x
+                //int y = (int)((NumberTerm)action.getTerm(1)).solve(); //El segundo parámetro de la función es la y
+                String tipo_objeto = (String)((StringTerm)action.getTerm(0)).getString(); //El tercer término es el tipo de objeto donde se deposita el libro
+                java.util.Set<Term> claves = ((MapTerm)action.getTerm(1)).keys(); //Claves recibidas
+                java.util.Collection<Term> valores = ((MapTerm)action.getTerm(1)).values(); //Valores recibidas
 
                 HashMap<String,String> mapa = new HashMap<String,String>();
 
@@ -195,8 +189,8 @@ public class TestEnv extends Environment {
 
                 InfoLibro info = new InfoLibro(mapa); //Clase para almacenar la información del libro
 
-                model.tomar_libro(x, y, tipo_objeto, info); //Se toma el libro de la posición
-                addPercept(libro_depositado_caja); //Se añade la percepción de que se ha tomado el libro de la caja
+                model.tomar_libro(tipo_objeto, info); //Se toma el libro de la posición
+                //addPercept(libro_depositado_caja); //Se añade la percepción de que se ha tomado el libro de la caja
             
                 
             }
@@ -207,6 +201,69 @@ public class TestEnv extends Environment {
                 int y = (int)((NumberTerm)action.getTerm(1)).solve();
                 Location dest = new Location(x,y);
                 model.movimiento_hacia(dest);
+            }
+            else if(action.getFunctor().equals("comprobar_dinero"))
+            {
+                //Función para comprobar el dinero del cliente
+                float dinero_cliente = (float)((NumberTerm)action.getTerm(0)).solve();
+                java.util.Set<Term> claves = ((MapTerm)action.getTerm(1)).keys(); //Claves recibidas
+                java.util.Collection<Term> valores = ((MapTerm)action.getTerm(1)).values(); //Valores recibidas
+				HashMap<String,String> mapa = new HashMap<String,String>(); //Mapa para almacenar los valores de InfoLibro
+                String agente_a_responder = action.getTerm(2).toString(); //Agente al que se le debe responder
+								
+				for(int i=0;i<valores.size();i++)
+                {
+                    mapa.put(claves.toArray()[i].toString(),valores.toArray()[i].toString());
+                }
+				
+				InfoLibro info = new InfoLibro(mapa); //Clase para almacenar la información del libro
+				
+                
+                float precio = info.precio; //Se extrae el precio del libro
+
+
+                MapTermImpl INFO_MAP = new MapTermImpl(); //Mapa del concepto Info_Libro que se va a devolver
+
+                //Se define el concepto del Info_Libro
+
+                Atom clave_autor = new Atom("autor");
+                VarTerm valor_autor = new VarTerm(info.autor);
+                INFO_MAP.put(clave_autor,valor_autor);                
+
+                //Se introduce el término del título
+                Atom clave_titulo = new Atom("titulo");
+                VarTerm valor_titulo = new VarTerm(info.titulo);
+                INFO_MAP.put(clave_titulo,valor_titulo);
+                
+                //Se intoruce el término del número de estantería
+                Atom clave_estanteria = new Atom("numestanteria");
+                VarTerm valor_estanteria = new VarTerm(Integer.toString(info.numestanteria));
+                INFO_MAP.put(clave_estanteria,valor_estanteria);  
+
+                //Se introduce el término del precio del libro
+                Atom clave_precio = new Atom("precio");
+                VarTerm valor_precio = new VarTerm(Float.toString(info.precio));
+                INFO_MAP.put(clave_precio,valor_precio);
+                
+                if (dinero_cliente >= precio)
+				{
+                    logger.info("SE POSEE DINERO SUFICIENTE");
+                    dinero_suficiente.clearAnnots();
+                    dinero_suficiente.addTerm(INFO_MAP);
+                    NumberTermImpl dinero_restante = new NumberTermImpl(dinero_cliente-precio);
+                    dinero_suficiente.addTerm(dinero_restante);
+					addPercept("cliente",dinero_suficiente);
+				}
+				else
+				{
+                    logger.info("NO SE POSEE DINERO SUFICIENTE");
+                    dinero_no_suficiente.clearAnnots();
+                    dinero_no_suficiente.addTerm(INFO_MAP);
+                    NumberTermImpl dinero_restante = new NumberTermImpl(dinero_cliente);
+                    dinero_no_suficiente.addTerm(dinero_restante);
+					addPercept("cliente",dinero_no_suficiente);	
+				}
+                
             }
             else if(action.getFunctor().equals("consultar_estanteria"))
             {
@@ -224,24 +281,36 @@ public class TestEnv extends Environment {
 
 
                 InfoLibro info = new InfoLibro(mapa); //Clase para almacenar la información del libro
-                TestModel.Estanteria est =  model.consultar_estanteria(info); //Se ejecuta la acción de consultar si dicho libro existe en las librerías
+                TestModel.ConsultaEstanteria resu_consulta = model.consultar_estanteria(info); //Se ejecuta la acción de consultar si dicho libro existe en las librerías
+                TestModel.Estanteria est = resu_consulta.est_consultada;
+                info = resu_consulta.libro_consultado;
+
                 if(est==null)
                 {
                     logger.info("No se ha encontrado el libro");
                     MapTermImpl INFO_MAP = new MapTermImpl(); //Mapa del concepto Info_Libro que se va a devolver
                     
                     //Se introduce el término del autor
+                    
                     StringTermImpl clave_autor = new StringTermImpl("autor");
                     StringTermImpl valor_autor = new StringTermImpl(info.autor);
                     INFO_MAP.put(clave_autor,valor_autor);
+                    
+
                     //Se introduce el término del título
+                    
                     StringTermImpl clave_titulo = new StringTermImpl("titulo");
                     StringTermImpl valor_titulo = new StringTermImpl(info.titulo);
                     INFO_MAP.put(clave_titulo,valor_titulo);
+                    
+
                     //Se intoruce el término del número de estantería
-                    StringTermImpl clave_estanteria = new StringTermImpl("NumEstanteria");
-                    StringTermImpl valor_estanteria = new StringTermImpl(Integer.toString(info.NumEstanteria));
+                    
+                    StringTermImpl clave_estanteria = new StringTermImpl("numestanteria");
+                    StringTermImpl valor_estanteria = new StringTermImpl(Integer.toString(info.numestanteria));
                     INFO_MAP.put(clave_estanteria,valor_estanteria);
+                    
+
 
                     libro_no_existente_area.clearAnnots(); //Se eliminan los posibles términos que pudiera contener la creencia
                     
@@ -263,21 +332,39 @@ public class TestEnv extends Environment {
 
                     //Se define el concepto del Info_Libro
                     //Se introduce el término del autor
-                    StringTermImpl clave_autor = new StringTermImpl("autor");
-                    StringTermImpl valor_autor = new StringTermImpl(info.autor);
-                    INFO_MAP.put(clave_autor,valor_autor);
+                    
+                    //StringTermImpl clave_autor = new StringTermImpl("autor");
+                    Atom clave_autor = new Atom("autor");
+                    //StringTermImpl valor_autor = new StringTermImpl(info.autor);
+                    VarTerm valor_autor = new VarTerm(info.autor);
+                    INFO_MAP.put(clave_autor,valor_autor);                
+
                     //Se introduce el término del título
-                    StringTermImpl clave_titulo = new StringTermImpl("titulo");
-                    StringTermImpl valor_titulo = new StringTermImpl(info.titulo);
+                    
+                    Atom clave_titulo = new Atom("titulo");
+                    VarTerm valor_titulo = new VarTerm(info.titulo);
                     INFO_MAP.put(clave_titulo,valor_titulo);
+                    
+
                     //Se intoruce el término del número de estantería
-                    StringTermImpl clave_estanteria = new StringTermImpl("NumEstanteria");
-                    StringTermImpl valor_estanteria = new StringTermImpl(Integer.toString(info.NumEstanteria));
+                    
+                    Atom clave_estanteria = new Atom("numestanteria");
+                    VarTerm valor_estanteria = new VarTerm(Integer.toString(est.id_));
                     INFO_MAP.put(clave_estanteria,valor_estanteria);  
+                    
+
+                    //Se introduce el término del precio del libro
+                    
+                    Atom clave_precio = new Atom("precio");
+                    VarTerm valor_precio = new VarTerm(Float.toString(info.precio));
+                    INFO_MAP.put(clave_precio,valor_precio);
+                    
+
+                    
                     
                     //Se define el concepto de la Estanteria
                     //Se introduce el término del id
-                    StringTermImpl clave_id = new StringTermImpl("id");
+                    Atom clave_id = new Atom("id");
                     //StringTermImpl valor_id = new StringTermImpl(Integer.toString(est.id_));
                     NumberTermImpl valor_id = new NumberTermImpl(est.id_);
                     ESTANTERIA_MAP.put(clave_id,valor_id);
@@ -320,6 +407,7 @@ public class TestEnv extends Environment {
 
     void updatePercepts()
     {
+        logger.info("ACTUALIZANDO PERCEPCIONES");
         //Función para actualizar la percepción de todos los agentes
         clearPercepts(); //Función que limpia la lista de percepciones de manera global
 
@@ -328,6 +416,46 @@ public class TestEnv extends Environment {
         //Se actualiza la posición del cliente
         Location lcliente = model.getAgPos(1); //Se añade la percepción del cliente 
         Literal position_client = Literal.parseLiteral("posicion");
+        
+        //Se comprueban cada una de las percepciones
+        Literal[] creencias_cliente = {}; //Se guardan todas las posibles percepciones que hayan podido ser lanzadas desde el environment
+        if(containsPercept​("cliente", libro_depositado_caja))
+        {
+            creencias_cliente = TestModel.append(creencias_cliente,libro_depositado_caja);
+        }
+        if(containsPercept​("cliente", libro_tomado_caja))
+        {
+            creencias_cliente = TestModel.append(creencias_cliente,libro_tomado_caja);
+        }
+        if(containsPercept​("cliente", libro_devuelto))
+        {
+            creencias_cliente = TestModel.append(creencias_cliente,libro_devuelto);
+        }
+        if(containsPercept​("cliente", libro_no_existente_area))
+        {
+            creencias_cliente = TestModel.append(creencias_cliente,libro_no_existente_area);
+        }
+        if(containsPercept​("cliente", libro_existente_estanteria))
+        {
+            creencias_cliente = TestModel.append(creencias_cliente,libro_existente_estanteria);
+        }
+        if(containsPercept​("cliente", dinero_suficiente))
+        {
+            creencias_cliente = TestModel.append(creencias_cliente,dinero_suficiente);
+        }
+        if(containsPercept​("cliente", dinero_no_suficiente))
+        {
+            creencias_cliente = TestModel.append(creencias_cliente,dinero_no_suficiente);
+        }
+
+        clearPercepts("cliente");
+        for(int num_creencias = 0; num_creencias<creencias_cliente.length;num_creencias++)
+        {
+            addPercept("cliente",creencias_cliente[num_creencias]);
+        }
+
+
+
         NumberTermImpl val_x = new NumberTermImpl(lcliente.x); //Val x de la posición del cliente
         NumberTermImpl val_y = new NumberTermImpl(lcliente.y); //Val y de la posición del cliente
         position_client.addTerm(val_x);

@@ -7,7 +7,7 @@
 
 
 !conocer_cajero. //Objetivo inicial de conocer al cajero
-
+dinero(35). //Concepción inicial del dinero que se tiene
 
 
 /*----------------*/
@@ -21,7 +21,8 @@
 						   .map.create(INFO_LIBRO); //Creación del map info_libro
 						   .map.put(INFO_LIBRO,titulo,ALATRISTE);
 						   .map.put(INFO_LIBRO,autor,REVERTE);
-						   .map.put(INFO_LIBRO,NumEstanteria,null);
+						   .map.put(INFO_LIBRO,numestanteria,null);
+						   .map.put(INFO_LIBRO,precio,null);
 						   +libro_tomado(INFO_LIBRO); //Se añade la posesión del libro
 						   .print("Concepto de libro tomado incluido");
 						   !devolver_libro; //Una vez que conoce al cajero, se le pone la necesidad de devolverle un libro
@@ -41,7 +42,7 @@
 +!devolver_libro : libro_tomado(INFO) & cajero(ID)<-// & info_libro(INFO)<- //Se se tiene el concepto de tener un libro
 	?pos(caja_del,X_CAJA_DEL,Y_CAJA_DEL);
 	!go(X_CAJA_DEL,Y_CAJA_DEL);
-	colocar_libro(1,1,"caja",INFO); //Ejecutar la acción de colocar libro en la caja;
+	colocar_libro("caja",INFO); //Ejecutar la acción de colocar libro en la caja;
 	-libro_tomado(INFO); //Se elimina la creencia del libro tomado
 	.send(ID,achieve,registrar_dev(INFO)); //Se le comunica al cajero el request de registrar la devolución
 	.print("Cliente : He solicitado la devolución de un libro");
@@ -53,7 +54,8 @@
 	.map.create(INFO_LIBRO_2); //Creación del map info_libro
 	.map.put(INFO_LIBRO_2,autor,KAFKA);
 	.map.put(INFO_LIBRO_2,titulo,LA_METAMORFOSIS);
-	.map.put(INFO_LIBRO_2,NumEstanteria,null);
+	.map.put(INFO_LIBRO_2,numestanteria,null);
+	.map.put(INFO_LIBRO_2,precio,null);
 	!consultar_info(INFO_LIBRO_2). //Surge el plan de consultar información sobre un libro
 
 @a2 //Plan para preguntar información
@@ -73,10 +75,43 @@
 //En el caso de que se le comunique que existe el libro por el que ha preguntado
 +libro_existente_estanteria(INFO,ESTANTERIA) : true <-
 	.print("Cliente : Se me ha comunicado que existe el libro");
-	.map.get(ESTANTERIA,"id",ID_EST); //Se guarda el valor de la ID de la estantería hacia la que moverse
+	.map.get(ESTANTERIA,id,ID_EST); //Se guarda el valor de la ID de la estantería hacia la que moverse
 	.print("Cliente : Valor de la id de la estanteria : ",ID_EST);
 	?pos(ID_EST,X_EST,Y_EST);
-	!go(X_EST,Y_EST).
+	!go(X_EST,Y_EST);
+	tomar_libro("estanteria",INFO);
+	+libro_tomado(INFO); //Se le da la percepción de libro tomado
+	.wait(1000);
+	!comprar_libro; //Se le da la necesidad de comprar un libro
+	.wait(2000).
+	
+@a3 //Plan para comprar un libro
++!comprar_libro : libro_tomado(INFO) & cajero(ID) & dinero(CANTIDAD_DINERO) <-
+	?pos(caja_del,X_CAJA_DEL,Y_CAJA_DEL);
+	!go(X_CAJA_DEL,Y_CAJA_DEL);
+	colocar_libro("caja",INFO);
+	-libro_tomado(INFO);
+	.print("Cliente : Voy a solicitar la compra de un libro");
+	.send(ID,achieve,comprar_libro_cliente(INFO,CANTIDAD_DINERO));//(INFO,CANTIDAD_DINERO)); //Se le pide comprar con 50 euros
+	.print("Cliente : He solicitado la compra de un libro a : ",ID).
+
+//En el caso de no tener dinero suficiente	
++dinero_no_suficiente(INFO,DINERO_CLIENTE) : true <-
+	.print("Cliente : Se me ha comunicado que no tengo dinero suficinete para comprar el libro");
+	.print("Cliente : Mi dinero restante es : ",DINERO_CLIENTE);
+	.abolish(dinero(_)); //Se elimina la creencia anterior del dinero
+	+dinero(DINERO_CLIENTE);
+	-comprar_libro.
+	
+//En el caso de tener dinero suficiente
++dinero_suficiente(INFO,DINERO_CLIENTE) : true <-//(INFO) : true <-
+	tomar_libro("caja",INFO); //Se toma el libro de la posición de la caja
+	+libro_tomado(INFO); //Se añade la posesión del libro
+	.print("Cliente : Mi dinero restante es : ",DINERO_CLIENTE);
+	.abolish(dinero(_)); //Se elimina la creencia anterior del dinero
+	+dinero(DINERO_CLIENTE);
+	.print("Cliente : He comprado el libro. Hasta luego, buen dia");
+	-comprar_libro.	
 	
 	
 +msg(M)[source(Ag)] :  true <- .print("Message from ",Ag,": ",M);-msg(M). //Para cuando llegue un mensaje

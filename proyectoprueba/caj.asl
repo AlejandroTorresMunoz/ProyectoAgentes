@@ -22,12 +22,17 @@ pos_caj_dev(P) :- pos(P,0,0).
 	.print("Cajero : Surge la necesidad de registrar la devolución de un libro de : ",Ag);
 	.print("Cajero : El ID del clienbte que se hija recibido es : ", source(Ag));
 	.print("info : ",INFO);
-	tomar_libro(1,1,"caja",INFO); //Se toma el libro de la posición de la caja
-	colocar_libro(0,0,"cajon_dev",INFO); //Se coloca el libro en el cajón de devoluciones
+	tomar_libro("caja",INFO); //Se toma el libro de la posición de la caja
+	colocar_libro("cajon_dev",INFO); //Se coloca el libro en el cajón de devoluciones
 	.wait(2000); //Se simula un retraso de 2 segundos antes de informar del concepto de que el libro ha sido devuelto
 	.send(Ag,tell,libro_devuelto). //Se le informa al cliente de que el libro ha sido devuelto
-	
 
+@comp1
++!comprar_libro_cliente(INFO,DINERO) : libro_depositado(caja) & msg(M)[source(Ag)] <-
+	.print("Cajero : Solicitud de compra recibida");
+	.print("Cajero : El valor de INFO es : ",INFO);
+	.print("Cajero : El valor de DINERO es : ",DINERO);
+	.print("Cajero : Procesando compra del agente : ",Ag);
+	comprobar_dinero(DINERO,INFO,Ag).
 
-//+libro_depositado(caja) : true <- .print("Cajero : Se ha encontrado un libro en la caja"). //En el caso de que tenga la percepción de que se ha depositado un libro en la caja
- 
+		

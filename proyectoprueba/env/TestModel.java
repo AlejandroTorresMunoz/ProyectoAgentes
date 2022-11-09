@@ -33,17 +33,30 @@ public class TestModel extends GridWorldModel {
     // the grid size
     public static final int GSize = 10; // Tamaño del grid que define el mundo
 
-    class Estanteria
+    public class Estanteria
     {
         //Clase para almacenar la información de una estanteria
-        int id_; //ID de la estanteria
-        Location pos_estanteria_; //Position de la estanteria
-        TestEnv.InfoLibro[] libros = {}; //Array con los valores de los libros 
+        public int id_; //ID de la estanteria
+        public Location pos_estanteria_; //Position de la estanteria
+        public TestEnv.InfoLibro[] libros = {}; //Array con los valores de los libros 
         private Estanteria(int id, int x, int y)
         {
             //Constructor de la clase
             id_ = id;
             pos_estanteria_ = new Location(x,y); 
+        }
+    }
+
+    public class ConsultaEstanteria
+    {
+        //Clase para almacenar los valores de la consulta a una estantería
+        public TestEnv.InfoLibro libro_consultado;
+        public Estanteria est_consultada;
+        private ConsultaEstanteria(TestEnv.InfoLibro lib, Estanteria est)
+        {
+            //Constructor de la clase
+            libro_consultado = lib;
+            est_consultada = est;
         }
     }
 
@@ -61,6 +74,9 @@ public class TestModel extends GridWorldModel {
             arr[N] = element;
             return arr;
         }
+
+
+
         public TestModel()
         {
             //Inicializador
@@ -106,12 +122,14 @@ public class TestModel extends GridWorldModel {
             HashMap<String,String> mapa_0_0 = new HashMap<String,String>();
             mapa_0_0.put("titulo","LA_METAMORFOSIS");
             mapa_0_0.put("autor","KAFKA");
-            mapa_0_0.put("NumEstanteria","0");
+            mapa_0_0.put("numestanteria","0");
+            mapa_0_0.put("precio","20");
             est0 = add_libro_est(est0, mapa_0_0);
             HashMap<String,String> mapa_0_1 = new HashMap<String,String>();
             mapa_0_1.put("titulo","STONER");
             mapa_0_1.put("autor","JOHN_WILLIAMS");
-            mapa_0_1.put("NumEstanteria","0");
+            mapa_0_1.put("numestanteria","0");
+            mapa_0_1.put("precio","25");
             est0 = add_libro_est(est0, mapa_0_1);
 
             array_estanterias = append(array_estanterias,est0);
@@ -124,12 +142,14 @@ public class TestModel extends GridWorldModel {
             HashMap<String,String> mapa_1_0 = new HashMap<String,String>();
             mapa_1_0.put("titulo","1984");
             mapa_1_0.put("autor","GEORGE_ORWELL");
-            mapa_1_0.put("NumEstanteria","1");
+            mapa_1_0.put("numestanteria","1");
+            mapa_1_0.put("precio","10");
             est1 = add_libro_est(est1, mapa_1_0);
             HashMap<String,String> mapa_1_1 = new HashMap<String,String>();
             mapa_1_1.put("titulo","REBELION_EN_LA_GRANJA");
             mapa_1_1.put("autor","GEORGE_ORWELL");
-            mapa_1_1.put("NumEstanteria","1");
+            mapa_1_1.put("numestanteria","1");
+            mapa_1_1.put("precio","15");
             est1 = add_libro_est(est1, mapa_1_1);
 
             array_estanterias = append(array_estanterias,est1);
@@ -147,23 +167,66 @@ public class TestModel extends GridWorldModel {
         }
 
 
-        void tomar_libro(int x,int y, String tipo_objeto,TestEnv.InfoLibro info)
+        void tomar_libro(String tipo_objeto,TestEnv.InfoLibro info)
         {
             /*
              * Función para tomar un libro de una posición dada
              */
             if (tipo_objeto.equals("caja"))
             {
+                //En el caso de que se tome el libro de la caja
+                Location pos_toma = new Location(TestEnv.lcaja.x,TestEnv.lcaja.y); //Posición de la caja en x e y
                 remove(TestEnv.LIBRO, TestEnv.lcaja.x, TestEnv.lcaja.y); 
             }
+            else if(tipo_objeto.equals("estanteria"))
+            {
+                //En el caso de que se tome el libro de una estanteria
+                int id_est_toma = info.numestanteria; //Se obtiene la ID de la estanteria donde se encuentra el libro
+                TestEnv.logger.info("VALOR DEL NUM_ESTANTERIA : "+Integer.toString(id_est_toma));
+                Estanteria est_to_manipulate; //Estantería sobre la que se va a trabajar
+                est_to_manipulate = array_estanterias[id_est_toma]; //Se busca la estantería con la que se va a trabajar
+                TestEnv.logger.info("El número de libros de la estantería "+Integer.toString(id_est_toma)+" es inicialmente : "+Integer.toString(array_estanterias[id_est_toma].libros.length));
+                
+                TestEnv.InfoLibro[] new_libros = {};//new TestEnv.InfoLibro[est_to_manipulate.libros.length-1]; //Nuevo array que se va a implementar sobre la estantería
+                
+                int index_to_remove = -1; //Índice dentro del array de libros de la estantería que se va a retirar
+                for(int i=0;i<est_to_manipulate.libros.length;i++)
+                {
+                    if(est_to_manipulate.libros[i].autor.equals(info.autor) && est_to_manipulate.libros[i].titulo.equals(info.titulo))
+                    {
+                        //En el caso de que se encuentre el libro que se desea
+                        index_to_remove = i;
+                        break;
+                    }
+                }
+
+                //Finalmente, se modifica el array "new_libros" y se carga sobre la estantería
+                for(int i=0;i<est_to_manipulate.libros.length;i++)
+                {
+                    if(i==index_to_remove)
+                    {
+                        //Se encuentra el libro que se va a tomar
+                        continue;
+                    }
+                    else
+                    {   
+                        //Para el resto de libros
+                        new_libros = append(new_libros,est_to_manipulate.libros[i]);
+                    }
+                }
+
+                //Finalmente, se actualiza la lista de libros de la estantería correspondiente
+                array_estanterias[id_est_toma].libros = new_libros;
+  
+            }
+
         }
 
-        void colocarlibro(int x, int y, String tipo_objeto, TestEnv.InfoLibro Libro)
+        void colocarlibro(String tipo_objeto, TestEnv.InfoLibro Libro)
         {
             /*
              * Función para colocar un libro sobre una posición dada, sobre un tipo de objeto dado
              */
-            Location pos_col = new Location(x,y); //Posición donde se va a colocar el libro
 
             if(tipo_objeto.equals("cajon_dev"))
             {
@@ -179,6 +242,7 @@ public class TestModel extends GridWorldModel {
             else if(tipo_objeto.equals("caja"))
             {
                 //Si se coloca sobre la caja
+                Location pos_col = new Location(TestEnv.lcaja.x,TestEnv.lcaja.y); //Posición de la caja en x e y
                 add(TestEnv.LIBRO, pos_col.x, pos_col.y); //Se añade el libro sobre la posición x,y 
             }
             
@@ -232,14 +296,16 @@ public class TestModel extends GridWorldModel {
             return getAgPos(id);
         }
 
-        Estanteria consultar_estanteria(TestEnv.InfoLibro info)
+        ConsultaEstanteria consultar_estanteria(TestEnv.InfoLibro info)
         {
             //Función para consultar si un libro existe o no sobre las estanterías
             //Devuelve true en caso de que exista, o false en caso contrario
             int num_estanterias = array_estanterias.length; //Número de estanterías
 
             boolean existe = false; //Valor a devolver. Sólo será true si se encuentra el título del libro
-            Estanteria est_to_return = null;
+            ConsultaEstanteria request_value_to_return = new ConsultaEstanteria(null,null);
+            Estanteria est_to_return;
+            TestEnv.InfoLibro lib_to_return;
             for(int num_est=0;num_est<num_estanterias;num_est++)
             {
                 //Se consulta cada una de las estanterías
@@ -254,11 +320,19 @@ public class TestModel extends GridWorldModel {
                     {
                         existe = true;
                         est_to_return = est_consulta;
+                        lib_to_return = libro_consulta;
+                        request_value_to_return.est_consultada = est_to_return;
+                        request_value_to_return.libro_consultado = lib_to_return;
                         break;
                     }
                 }
             } 
+
+            if(existe==false)
+            {
+                request_value_to_return.libro_consultado = info;
+            }
             
-            return est_to_return;
+            return request_value_to_return;
         }
 }

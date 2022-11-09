@@ -23,7 +23,7 @@
 	.print("Asistente : No se conoce el libro");
 	.map.get(INFO,"titulo",VALOR_TITULO); //Se obtiene el valor del titulo
 	.map.get(INFO,"autor",VALOR_AUTOR); //Se obtiene el valor del autor
-	.map.get(INFO,"NumEstanteria",VALOR_ESTANTERIA); //Se obtiene el valor de la estanteria
+	.map.get(INFO,"numestanteria",VALOR_ESTANTERIA); //Se obtiene el valor de la estanteria
 	//.print("Asistente : El valor de autor que no se ha encontrado es : ",VALOR_AUTOR);
 	//.print("Asistente : El valor de titulo que no se ha encontrado es : ",VALOR_TITULO);
 	//.print("Asistente : El valor de estanteria que no se ha encontrado es : ",VALOR_ESTANTERIA);
@@ -33,7 +33,12 @@
 	
 +libro_existente_estanteria(INFO,ESTANTERIA,ID_AG) : true <-
 	.print("Asistente : Se conoce el libro");
-	.map.get(ESTANTERIA,"id",VALOR_ID); //Se guarda el valor de la ID 
+	.map.get(ESTANTERIA,id,VALOR_ID); //Se guarda el valor de la ID 
+	.map.get(INFO,titulo,VALOR_TIT);
+	.map.get(INFO,numestanteria,VALOR_NUM_EST);
+	.type(VALOR_TIT,TIPO_TIT);
+	.print("Asistente : El valor que se recibe de titulo es : ",VALOR_TIT);
+	.print("Asistente : El valor que se recibe de numero de estanteria es : ",VALOR_NUM_EST);
 	//.print("Asistente : El valor de la ID de la estanteria es : ",VALOR_ID);
 	.send(ID_AG,tell,libro_existente_estanteria(INFO,ESTANTERIA)).
 	
