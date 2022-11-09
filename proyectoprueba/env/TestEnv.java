@@ -102,6 +102,14 @@ public class TestEnv extends Environment {
     public static final int pos_x_caja_delante = 1; //Posición de la caja, en x
     public static final int pos_y_caja_delante = 2; //Posición de la caja, en y
     public static Location lcaja_delante = new Location(pos_x_caja_delante, pos_y_caja_delante); //Location de la caja
+    //Posición delante de la estantería 0
+    public static final int pos_x_est_0_delante = 8;
+    public static final int pos_y_est_0_delante = 1;
+    public static Location est0_delante = new Location(pos_x_est_0_delante, pos_y_est_0_delante);
+    //Posición delante de la estantería 1
+    public static final int pos_x_est_1_delante = 8;
+    public static final int pos_y_est_1_delante = 2;
+    public static Location est1_delante = new Location(pos_x_est_1_delante, pos_y_est_1_delante);
     //Posición del cajón de devoluciones
     public static final int pos_x_cajon = 0; //Posición de la caja, en x
     public static final int pos_y_cajon = 0; //Posición de la caja, en y
@@ -367,6 +375,12 @@ public class TestEnv extends Environment {
         Location position_assistent =   model.getAgPos(2);
         Literal pos_assistent = Literal.parseLiteral("pos(asistente,"+position_assistent.x+","+position_assistent.y+")");
         addPercept("cliente",pos_assistent);
+        //Se actualiza la posición de la estantería 0
+        Literal pos_est_0 = Literal.parseLiteral("pos("+Integer.toString(0)+","+est0_delante.x+","+est0_delante.y+")");
+        addPercept("cliente",pos_est_0);
+        //Se actualiza la posición de la estantería 1
+        Literal pos_est_1 = Literal.parseLiteral("pos("+Integer.toString(1)+","+est1_delante.x+","+est1_delante.y+")");
+        addPercept("cliente",pos_est_1);
 
         //removePercept("cliente",poscliente);
         //addPercept("cliente",poscliente); //Se le añade la percepción al cliente 

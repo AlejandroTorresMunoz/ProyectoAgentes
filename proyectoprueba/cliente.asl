@@ -93,8 +93,11 @@
 +libro_existente_estanteria(INFO,ESTANTERIA) : true <-
 	.print("Cliente : Se me ha comunicado que existe el libro");
 	.map.get(ESTANTERIA,"id",ID_EST); //Se guarda el valor de la ID de la estantería hacia la que moverse
-	.print("Cliente : Valor de la id de la estanteria : ",ESTANTERIA);
-	!go(8,1);
+	.print("Cliente : Valor de la id de la estanteria : ",ID_EST);
+	.type(ID_EST,TIPO);
+	.print("Tipo de la variable : ",TIPO);
+	?pos(ID_EST,X_EST,Y_EST);
+	!go(X_EST,Y_EST);
 	//!at(cliente,ESTANTERIA); //Se le comunica que se mueva hacia la libreria indicada
 	.print("Cliente : Objetivo establecido para moverse hacia la estanteria").
 	
