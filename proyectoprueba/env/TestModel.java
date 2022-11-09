@@ -205,6 +205,27 @@ public class TestModel extends GridWorldModel {
 
         }
 
+        void movimiento_hacia(Location dest) throws Exception
+        {
+            Location r1 = getAgPos(1); //Para el cliente
+            Location r_last = r1; //Se obtiene la posición del agente previa al movimiento, para luego actualizar el grid en dicha
+            if (r1.x < dest.x)
+                r1.x++;
+            else if (r1.x > dest.x)
+                r1.x--;
+            if (r1.y < dest.y)
+                r1.y++;
+            else if (r1.y > dest.y)
+                r1.y--;
+            setAgPos(1, r1);
+
+            // Se repinta la posición de 
+            if (view != null) {
+                //view.update(r_last.x,r_last.y);
+                view.update(); //Se repinta todo el frame
+            }
+        }
+
         Location obtener_pos_ag(int id) throws Exception
         {
             //Función para obtener la posición de un agente dada su id

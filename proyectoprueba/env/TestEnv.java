@@ -218,6 +218,14 @@ public class TestEnv extends Environment {
                 model.moveTowards(dest);
 
             }
+            else if(action.getFunctor().equals("movimiento_hacia"))
+            {
+                //Función para moverse hacia una posición dados x e y como términos
+                int x = (int)((NumberTerm)action.getTerm(0)).solve();
+                int y = (int)((NumberTerm)action.getTerm(1)).solve();
+                Location dest = new Location(x,y);
+                model.movimiento_hacia(dest);
+            }
             else if(action.getFunctor().equals("consultar_estanteria"))
             {
                 //Función para consultar la existencia de un libro dentro de las estanterías
@@ -342,7 +350,27 @@ public class TestEnv extends Environment {
         Location cajaLoc = new Location(pos_x_caja, pos_y_caja); //Localización de la caja
 
 
+        //PRUEBA NUEVA
+        //Se actualiza la posición del cliente
         Location lcliente = model.getAgPos(1); //Se añade la percepción del cliente 
+        Literal position_client = Literal.parseLiteral("posicion");
+        NumberTermImpl val_x = new NumberTermImpl(lcliente.x); //Val x de la posición del cliente
+        NumberTermImpl val_y = new NumberTermImpl(lcliente.y); //Val y de la posición del cliente
+        position_client.addTerm(val_x);
+        position_client.addTerm(val_y);
+        addPercept("cliente",position_client);
+
+        //Se actualiza la posición de la caja
+        Literal pos_caja = Literal.parseLiteral("pos(caja,"+lcaja_delante.x+","+lcaja_delante.y+")");
+        addPercept("cliente",pos_caja);
+        //Se actualiza la posición del asistente
+        Location position_assistent =   model.getAgPos(2);
+        Literal pos_assistent = Literal.parseLiteral("pos(asistente,"+position_assistent.x+","+position_assistent.y+")");
+        addPercept("cliente",pos_assistent);
+
+        //removePercept("cliente",poscliente);
+        //addPercept("cliente",poscliente); //Se le añade la percepción al cliente 
+        
 
         if(model.hasObject(LIBRO, cajaLoc))
         {
@@ -374,8 +402,8 @@ public class TestEnv extends Environment {
             removePercept("cliente", ad);
         }
 
-        logger.info("El valor de la creencia ad : "+Boolean.toString(containsPercept​("cliente",ad)));
-        logger.info("El valor de la creencia cj : "+Boolean.toString(containsPercept​("cliente",cj)));
+        //logger.info("El valor de la creencia ad : "+Boolean.toString(containsPercept​("cliente",ad)));
+        //logger.info("El valor de la creencia cj : "+Boolean.toString(containsPercept​("cliente",cj)));
     }
 
 
