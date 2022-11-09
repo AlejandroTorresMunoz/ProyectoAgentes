@@ -116,6 +116,7 @@ public class TestEnv extends Environment {
     public static final Literal libro_tomado_caja = Literal.parseLiteral("libro_tomado(caja)"); //Libro tomado de la caja
     public static final Literal ad = Literal.parseLiteral("at(cliente,ID_ASISTENTE)"); //Percepcion de que el cliente se encuentra en la posición cercana al asistente de la zona
     public static final Literal cj = Literal.parseLiteral("at(cliente,caja)"); //Percepción de que el cliente se encuentra en la posición de la caja
+    public static final Literal ae = Literal.parseLiteral("at(cliente,ID_EST)"); //Percepción de que el cliente se encuentra en la posición de la estantería recibida
     public static final Literal libro_devuelto = Literal.parseLiteral("libro_devuelto"); //Libro devuelto con éxito 
     public static final Literal libro_existente_area = Literal.parseLiteral("libro_existente_area"); //Libro existente en la zona
     public static final Literal libro_no_existente_area = Literal.parseLiteral("libro_no_existente_area"); //Libro existente en la zona
@@ -198,6 +199,7 @@ public class TestEnv extends Environment {
 
                 String l = action.getTerm(0).toString(); //Se almacena el objeto hacia el que se desea mover 
                 Location dest = null;
+                logger.info("move_towards: valor de l : "+l);
                 if(l.equals(new String("caja")))
                 {
                     //Se mueve hacia la posición de la caja
@@ -208,6 +210,10 @@ public class TestEnv extends Environment {
                     //Se mueve hacia la posición del asistente
                     dest = model.getAgPos(2);
                     dest.x = dest.x-1;
+                }
+                else if(l.equals(new String("1")))
+                {
+                    logger.info("Se ha recibido la orden movimiento hacia la estantería.");
                 }
                 model.moveTowards(dest);
 
@@ -341,8 +347,11 @@ public class TestEnv extends Environment {
         if(model.hasObject(LIBRO, cajaLoc))
         {
             //En el caso de que se coloque un libro en la posición de la caja
-            
             addPercept(libro_depositado_caja); //Se añade la percepción de que hay un libro depositado sobre la caja
+        }
+        else
+        {
+            removePercept(libro_depositado_caja);
         }
 
         // Se añade la percepción al cliente de la posición de la caja
@@ -350,13 +359,23 @@ public class TestEnv extends Environment {
             //En el caso de que la posición del cliente sea la de la caja
             addPercept("cliente", cj); //Se le añade la percepción de de que se encuentra en la caja
         }
+        else
+        {
+            removePercept("cliente", cj);
+        }
 
         if(lcliente.distance(asistenteLoc) < 2)
         {
             //Si el cliente se encuentra a menos de 1 del asistente
             addPercept("cliente", ad);
         }
+        else
+        {
+            removePercept("cliente", ad);
+        }
 
+        logger.info("El valor de la creencia ad : "+Boolean.toString(containsPercept​("cliente",ad)));
+        logger.info("El valor de la creencia cj : "+Boolean.toString(containsPercept​("cliente",cj)));
     }
 
 
