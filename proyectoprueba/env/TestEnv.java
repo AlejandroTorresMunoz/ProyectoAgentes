@@ -336,10 +336,6 @@ public class TestEnv extends Environment {
                     VarTerm valor_precio = new VarTerm(Float.toString(info.precio));
                     INFO_MAP.put(clave_precio,valor_precio);
                     
-
-                    
-                    
-                    
                     //Se introduce el término del id de la estantería
                     Atom clave_id = new Atom("id");
                     NumberTermImpl valor_id = new NumberTermImpl(est.id_);
@@ -391,7 +387,6 @@ public class TestEnv extends Environment {
         Location lcliente = model.getAgPos(1); //Se añade la percepción del cliente 
         Literal position_client = Literal.parseLiteral("posicion");
         
-
         /*
          * A continuación, se procede a guardar cada una de las creencias que poseía el agente tipo cliente, excepto las de posición.
          * Tras ello, se eliminan todas sus creencias
