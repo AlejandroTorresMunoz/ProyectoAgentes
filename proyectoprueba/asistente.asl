@@ -16,31 +16,18 @@
 					
 //Plan para cuando un cliente pregunta sobre un libro 
 +?libro_existente_area(INFO)[source(Ag)] : true <- 	
-	.print("Asistente : He recibido un mensaje de : ",Ag); 
+	.print("Asistente : He  sido preguntado por la existencia de un libro por parte de : ",Ag); 
 	consultar_estanteria(INFO,Ag). //Lanza la acción de consultar la estantería 
 					
-+libro_no_existente_area(INFO,ID_AG) : true <-
+//En el caso de que el libro no se conozca para el asistente
++libro_no_existente_area(INFO,ID_AG) : true <- //Se le añade a la percepción de libro no existente tanto el InfoLibro como el agente al que responder
 	.print("Asistente : No se conoce el libro");
-	.map.get(INFO,"titulo",VALOR_TITULO); //Se obtiene el valor del titulo
-	.map.get(INFO,"autor",VALOR_AUTOR); //Se obtiene el valor del autor
-	.map.get(INFO,"numestanteria",VALOR_ESTANTERIA); //Se obtiene el valor de la estanteria
-	//.print("Asistente : El valor de autor que no se ha encontrado es : ",VALOR_AUTOR);
-	//.print("Asistente : El valor de titulo que no se ha encontrado es : ",VALOR_TITULO);
-	//.print("Asistente : El valor de estanteria que no se ha encontrado es : ",VALOR_ESTANTERIA);
-	//.print("Asistente : El valor de Ag es : ",ID_AG);
-	.send(ID_AG,tell,libro_no_existente_area(INFO)).
+	.send(ID_AG,tell,libro_no_existente_area(INFO)). //Se le informa al agente de la no existencia del libro
 	
-	
-+libro_existente_estanteria(INFO,ESTANTERIA,ID_AG) : true <-
+//En el caso de que el libro se conozca para el asistente
++libro_existente_estanteria(INFO,ESTANTERIA,ID_AG) : true <- //Se le añade a la percepción de libro existente tanto el InfoLibro como el agente al que responder
 	.print("Asistente : Se conoce el libro");
-	.map.get(ESTANTERIA,id,VALOR_ID); //Se guarda el valor de la ID 
-	.map.get(INFO,titulo,VALOR_TIT);
-	.map.get(INFO,numestanteria,VALOR_NUM_EST);
-	.type(VALOR_TIT,TIPO_TIT);
-	.print("Asistente : El valor que se recibe de titulo es : ",VALOR_TIT);
-	.print("Asistente : El valor que se recibe de numero de estanteria es : ",VALOR_NUM_EST);
-	//.print("Asistente : El valor de la ID de la estanteria es : ",VALOR_ID);
-	.send(ID_AG,tell,libro_existente_estanteria(INFO,ESTANTERIA)).
+	.send(ID_AG,tell,libro_existente_estanteria(INFO,ESTANTERIA)). //Se le informa al agente de la existencia del libro
 	
 	
 					

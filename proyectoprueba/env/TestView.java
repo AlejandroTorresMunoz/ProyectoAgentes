@@ -1,7 +1,6 @@
 package env;
 
 import jason.environment.grid.*;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -128,4 +127,5 @@ public class TestView extends GridWorldView {
         g.setColor(Color.WHITE);
         drawString(g,x,y,defaultFont, "Libro"); //Se dibuja la cadena sobre la posición del lirbo
     }
+
 }
